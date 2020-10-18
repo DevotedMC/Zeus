@@ -12,7 +12,7 @@ public class PlayerTransferSession extends PacketSession {
 	private ArtemisServer sourceServer;
 	private ArtemisServer targetServer;
 	
-	public PlayerTransferSession(ChildServer source, long transactionID, UUID player) {
+	public PlayerTransferSession(ChildServer source, String transactionID, UUID player) {
 		super(source, transactionID);
 		this.player = player;
 	}

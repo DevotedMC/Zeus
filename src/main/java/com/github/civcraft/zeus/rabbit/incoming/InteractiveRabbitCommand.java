@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.requests;
+package com.github.civcraft.zeus.rabbit.incoming;
 
 import java.util.function.Supplier;
 
@@ -30,7 +30,7 @@ public abstract class InteractiveRabbitCommand<S extends PacketSession> extends 
 		return true;
 	}
 
-	public final PacketSession getNewSession(ChildServer source, long transactionID, JSONObject data) {
+	public final PacketSession getNewSession(ChildServer source, String transactionID, JSONObject data) {
 		return getFreshSession(source, transactionID, data);
 	}
 
@@ -38,7 +38,7 @@ public abstract class InteractiveRabbitCommand<S extends PacketSession> extends 
 	 * Creates a new packet session to be used. Needs to be overwritten if
 	 * createSession() returns true
 	 */
-	protected S getFreshSession(ChildServer source, long transactionID, JSONObject data) {
+	protected S getFreshSession(ChildServer source, String transactionID, JSONObject data) {
 		return null;
 	}
 

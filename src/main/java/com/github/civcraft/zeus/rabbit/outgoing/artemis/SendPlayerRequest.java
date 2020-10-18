@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.rabbit.messages.artemis;
+package com.github.civcraft.zeus.rabbit.outgoing.artemis;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ public class SendPlayerRequest extends RabbitMessage {
 
 	private UUID player;
 	
-	public SendPlayerRequest(long transactionID, UUID player) {
+	public SendPlayerRequest(String transactionID, UUID player) {
 		super(transactionID);
 		this.player = player;
 	}
@@ -25,7 +25,7 @@ public class SendPlayerRequest extends RabbitMessage {
 	}
 
 	@Override
-	protected String getIdentifier() {
+	public String getIdentifier() {
 		return "receive_player_request";
 	}
 

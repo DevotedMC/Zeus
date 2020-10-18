@@ -8,9 +8,9 @@ import org.json.JSONObject;
  */
 public abstract class RabbitMessage {
 
-	private long transactionID;
+	private final String transactionID;
 
-	public RabbitMessage(long transactionID) {
+	public RabbitMessage(String transactionID) {
 		this.transactionID = transactionID;
 	}
 
@@ -38,6 +38,6 @@ public abstract class RabbitMessage {
 	/**
 	 * @return Unique identifier for this kind of packet
 	 */
-	protected abstract String getIdentifier();
+	public abstract String getIdentifier();
 
 }

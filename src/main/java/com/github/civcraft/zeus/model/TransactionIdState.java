@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus;
+package com.github.civcraft.zeus.model;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,27 +8,27 @@ import com.github.civcraft.zeus.rabbit.PacketSession;
 
 public class TransactionIdState {
 	
-	private AtomicLong serverSideCounter;
-	private Map<Long, PacketSession> activeSessions;
+	private AtomicLong localCounter;
+	private Map<String, PacketSession> activeSessions;
 	
 	public TransactionIdState() {
-		serverSideCounter = new AtomicLong(1);
+		localCounter = new AtomicLong(1);
 		activeSessions = new ConcurrentHashMap<>();
 	}
 	
-	public long pullNewTicket() {
-		return serverSideCounter.incrementAndGet();
+	public String pullNewTicket() {
+		return "zeus" + localCounter.incrementAndGet();
 	}
 	
-	public PacketSession getSession(long id) {
+	public PacketSession getSession(String id) {
 		return activeSessions.get(id);
 	}
 	
-	public void deleteSession(long id) {
+	public void deleteSession(String id) {
 		activeSessions.remove(id);
 	}
 	
-	public void putSession(long id, PacketSession session) {
+	public void putSession(String id, PacketSession session) {
 		activeSessions.put(id, session);
 	}
 

@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus;
+package com.github.civcraft.zeus.model;
 
 public class Location {
 	

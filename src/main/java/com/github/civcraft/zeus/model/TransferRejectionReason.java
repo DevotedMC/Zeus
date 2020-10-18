@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus;
+package com.github.civcraft.zeus.model;
 
 /**
  * When an artemis/minecraft server requests a transfer of a player to another server, the transfer

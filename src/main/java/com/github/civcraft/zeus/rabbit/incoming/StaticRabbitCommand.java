@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.requests;
+package com.github.civcraft.zeus.rabbit.incoming;
 
 import java.util.function.Supplier;
 
@@ -31,7 +31,8 @@ public abstract class StaticRabbitCommand extends RabbitRequest {
 		return false;
 	}
 	
-	public PacketSession getNewSession(ChildServer source, long transactionID, JSONObject data) {
+	@Override
+	public PacketSession getNewSession(ChildServer source, String transactionID, JSONObject data) {
 		throw new IllegalStateException();
 	}
 

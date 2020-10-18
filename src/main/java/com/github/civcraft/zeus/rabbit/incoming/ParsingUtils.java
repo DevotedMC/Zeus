@@ -1,8 +1,8 @@
-package com.github.civcraft.zeus.requests;
+package com.github.civcraft.zeus.rabbit.incoming;
 
 import org.json.JSONObject;
 
-import com.github.civcraft.zeus.Location;
+import com.github.civcraft.zeus.model.Location;
 
 public class ParsingUtils {
 

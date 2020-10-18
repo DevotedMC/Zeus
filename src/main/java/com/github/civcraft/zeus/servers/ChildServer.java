@@ -1,6 +1,6 @@
 package com.github.civcraft.zeus.servers;
 
-import com.github.civcraft.zeus.TransactionIdState;
+import com.github.civcraft.zeus.model.TransactionIdState;
 import com.google.common.base.Preconditions;
 
 /**

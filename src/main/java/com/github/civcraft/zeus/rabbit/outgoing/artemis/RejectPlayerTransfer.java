@@ -1,15 +1,16 @@
-package com.github.civcraft.zeus.rabbit.messages.artemis;
+package com.github.civcraft.zeus.rabbit.outgoing.artemis;
 
 import org.json.JSONObject;
 
+import com.github.civcraft.zeus.model.TransferRejectionReason;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.google.common.base.Preconditions;
 
 public class RejectPlayerTransfer extends RabbitMessage {
 	
-	private String reason;
+	private TransferRejectionReason reason;
 
-	public RejectPlayerTransfer(long transactionID, String reason) {
+	public RejectPlayerTransfer(String transactionID, TransferRejectionReason reason) {
 		super(transactionID);
 		Preconditions.checkNotNull(reason);
 		this.reason = reason;
@@ -17,11 +18,11 @@ public class RejectPlayerTransfer extends RabbitMessage {
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		json.put("reason", reason);
+		json.put("reason", reason.toString());
 	}
 
 	@Override
-	protected String getIdentifier() {
+	public String getIdentifier() {
 		return "reject_transfer";
 	}
 

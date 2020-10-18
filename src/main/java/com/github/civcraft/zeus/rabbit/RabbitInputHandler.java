@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.github.civcraft.zeus.requests.RabbitRequest;
+import com.github.civcraft.zeus.rabbit.incoming.RabbitRequest;
 import com.github.civcraft.zeus.servers.ChildServer;
 
 /**
@@ -54,8 +54,8 @@ public class RabbitInputHandler {
 			command.handle(null, sourceServer, input);
 			return;
 		}
-		long transactionID = input.optLong("transaction_id", -1);
-		if (transactionID == -1) {
+		String transactionID = input.optString("transaction_id", "");
+		if (transactionID.isEmpty()) {
 			logger.error("Expected transaction id in packet of type " + type + ", but found none");
 			return;
 		}

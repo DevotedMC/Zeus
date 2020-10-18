@@ -9,11 +9,11 @@ import com.github.civcraft.zeus.servers.ChildServer;
 public abstract class PacketSession {
 	
 	private final ChildServer source;
-	private final long transactionID;
+	private final String transactionID;
 	private final long creationTime;
 	private long lastUpdate;
 	
-	public PacketSession(ChildServer source, long transactionID) {
+	public PacketSession(ChildServer source, String transactionID) {
 		this.source = source;
 		this.transactionID = transactionID;
 		this.creationTime = System.currentTimeMillis();
@@ -32,7 +32,7 @@ public abstract class PacketSession {
 		return 10_000L;
 	}
 	
-	public long getTransactionID() {
+	public String getTransactionID() {
 		return transactionID;
 	}
 	

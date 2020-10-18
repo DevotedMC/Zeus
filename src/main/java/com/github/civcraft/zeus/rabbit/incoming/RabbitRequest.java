@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.requests;
+package com.github.civcraft.zeus.rabbit.incoming;
 
 import java.util.function.Supplier;
 
@@ -21,7 +21,7 @@ public abstract class RabbitRequest {
 	
 	public abstract boolean useSession();
 	
-	public abstract PacketSession getNewSession(ChildServer source, long transactionID, JSONObject data);
+	public abstract PacketSession getNewSession(ChildServer source, String transactionID, JSONObject data);
 	
 	protected Logger getLogger() {
 		return ZeusMain.getInstance().getLogger();

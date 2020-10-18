@@ -22,12 +22,13 @@ Initial situation: The player is on the server Alice, connected through a Bungee
 - If the "reply_receive_player_request" packet is received and accepts the transfer, Zeus sends a "accept_transfer" packet to Alice
 
 5. Alice receives the "accept_transfer" packet and aggregates any leftover temporary states regarding the player that should be passed on and sends them to Zeus in a "transfer_player_data" packet.
+- If Alice receives neither an "accept_transfer", nor a "reject_transfer" within 15 seconds, the players connection is killed by Alice.
 
 6. Zeus receives the "transfer_player_data" packet and forwards it to Bob.
 
 7. Bob receives the "transfer_player_data" packet, loads all additional data regarding the player it needs from Zeus and sends a "ready_player_transfer" packet to Zeus once it is fully ready to accept the player
 
-8. Zeus receives the "ready_player_transfer" packet and sends a "transfer_player_bungee" containing the players UUID and Bobs name to all bungee servers.
+8. Zeus receives the "ready_player_transfer" packet and sends a "transfer_player_bungee" containing the players UUID and Bobs name to all bungee servers. Additionally the players current server is set to Bob.
 
 9. The responsible bungee server switches the players connection to Bob
 

@@ -1,5 +1,7 @@
 package com.github.civcraft.zeus.model;
 
+import org.json.JSONObject;
+
 public class Location {
 	
 	private final double x;
@@ -22,6 +24,12 @@ public class Location {
 	
 	public double getZ() {
 		return z;
+	}
+	
+	public void writeToJson(JSONObject json) {
+		json.put("x", x);
+		json.put("y", y);
+		json.put("z", z);
 	}
 
 }

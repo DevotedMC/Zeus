@@ -16,7 +16,7 @@ import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerRequest;
 import com.github.civcraft.zeus.rabbit.sessions.PlayerTransferSession;
 import com.github.civcraft.zeus.servers.ArtemisServer;
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTransferSession> {
 
@@ -30,18 +30,13 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 		return true;
 	}
 
-	@Override
-	public boolean destroySession() {
-		return false;
-	}
-
-	protected PlayerTransferSession getFreshSession(ChildServer source, String transactionID, JSONObject data) {
+	protected PlayerTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
 		return new PlayerTransferSession(source, transactionID, player);
 	}
 
 	@Override
-	public boolean handleRequest(PlayerTransferSession connState, ChildServer sendingServer, JSONObject data) {
+	public boolean handleRequest(PlayerTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
 		if (!(sendingServer instanceof ArtemisServer)) {
 			sendReply(sendingServer, new RejectPlayerTransfer(connState.getTransactionID(),
 					TransferRejectionReason.INVALID_SOURCE));
@@ -50,11 +45,9 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 		}
 		ArtemisServer sourceServer = (ArtemisServer) sendingServer;
 		connState.setSourceServer(sourceServer);
-		String exitDirection = data.getString("exit");
-		CardinalDirection direction = CardinalDirection.valueOf(exitDirection);
-		Location loc = ParsingUtils.parseLocation(data);
+		Location loc = ParsingUtils.parseLocation(data.getJSONObject("loc"));
 		ArtemisServer targetServer = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(sourceServer,
-				direction, loc);
+				 loc);
 		if (targetServer == null) {
 			sendReply(sendingServer, new RejectPlayerTransfer(connState.getTransactionID(),
 					TransferRejectionReason.NO_TARGET_FOUND));
@@ -62,7 +55,7 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 			return false;
 		}
 		connState.setTargetServer(targetServer);
-		sendReply(targetServer, new SendPlayerRequest(connState.getTransactionID(), connState.getPlayer()));
+		sendReply(targetServer, new SendPlayerRequest(connState.getTransactionID(), connState.getPlayer(), loc));
 		return true;
 	}
 

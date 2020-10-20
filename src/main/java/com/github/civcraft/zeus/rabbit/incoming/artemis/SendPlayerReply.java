@@ -7,7 +7,7 @@ import com.github.civcraft.zeus.rabbit.PacketSession;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.sessions.PlayerTransferSession;
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 /**
  * Sent in reply to SendPlayerRequest to tell whether the target server wants to
@@ -17,13 +17,12 @@ import com.github.civcraft.zeus.servers.ChildServer;
 public class SendPlayerReply extends InteractiveRabbitCommand<PlayerTransferSession> {
 
 	@Override
-	public boolean handleRequest(PlayerTransferSession connState, ChildServer sendingServer, JSONObject data) {
+	public boolean handleRequest(PlayerTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
 		boolean accept = data.getBoolean("accept");
 		if (accept) {
-			//TODO maybe ask source server for extra data to pass along first?
 			// TODO bungee shit
 		} else {
-			// TODO send back to origin
+			// TODO send back to origin, bungee shit
 			sendReply(connState.getSourceServer(),
 					new RejectPlayerTransfer(connState.getTransactionID(), TransferRejectionReason.TARGET_REJECT));
 			return false;
@@ -38,11 +37,6 @@ public class SendPlayerReply extends InteractiveRabbitCommand<PlayerTransferSess
 
 	@Override
 	public boolean createSession() {
-		return false;
-	}
-
-	@Override
-	public boolean destroySession() {
 		return false;
 	}
 

@@ -1,19 +1,19 @@
 package com.github.civcraft.zeus;
 
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class ServerManager {
 	
 	
-	public void registerServer(ChildServer server) {
+	public void registerServer(ConnectedServer server) {
 		
 	}
 	
-	public void unregisterServer(ChildServer server) {
+	public void unregisterServer(ConnectedServer server) {
 		
 	}
 	
-	public ChildServer getServer(String identifier) {
+	public ConnectedServer getServer(String identifier) {
 		return null;
 	}
 

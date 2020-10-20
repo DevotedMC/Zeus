@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.github.civcraft.zeus.rabbit.PacketSession;
 import com.github.civcraft.zeus.servers.ArtemisServer;
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerTransferSession extends PacketSession {
 
@@ -12,7 +12,7 @@ public class PlayerTransferSession extends PacketSession {
 	private ArtemisServer sourceServer;
 	private ArtemisServer targetServer;
 	
-	public PlayerTransferSession(ChildServer source, String transactionID, UUID player) {
+	public PlayerTransferSession(ConnectedServer source, String transactionID, UUID player) {
 		super(source, transactionID);
 		this.player = player;
 	}

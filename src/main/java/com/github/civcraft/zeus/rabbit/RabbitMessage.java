@@ -2,6 +2,8 @@ package com.github.civcraft.zeus.rabbit;
 
 import org.json.JSONObject;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Represents a message that is sent to a client, possibly as a reply
  *
@@ -11,6 +13,7 @@ public abstract class RabbitMessage {
 	private final String transactionID;
 
 	public RabbitMessage(String transactionID) {
+		Preconditions.checkNotNull(transactionID);
 		this.transactionID = transactionID;
 	}
 

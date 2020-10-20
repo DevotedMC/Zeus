@@ -6,18 +6,20 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.github.civcraft.zeus.rabbit.PacketSession;
 
-public class TransactionIdState {
+public class TransactionIdManager {
 	
 	private AtomicLong localCounter;
 	private Map<String, PacketSession> activeSessions;
+	private String identifier;
 	
-	public TransactionIdState() {
+	public TransactionIdManager(String ownIdentifier) {
 		localCounter = new AtomicLong(1);
+		this.identifier = ownIdentifier;
 		activeSessions = new ConcurrentHashMap<>();
 	}
 	
 	public String pullNewTicket() {
-		return "zeus" + localCounter.incrementAndGet();
+		return identifier + localCounter.incrementAndGet();
 	}
 	
 	public PacketSession getSession(String id) {

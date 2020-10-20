@@ -9,7 +9,9 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.model.TransactionIdManager;
+import com.github.civcraft.zeus.rabbit.abstr.AbstractRabbitInputHandler;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -30,24 +32,24 @@ public class RabbitGateway {
 	private ConnectionFactory connectionFactory;
 	private Logger logger;
 	private Connection conn;
-	private Map<ChildServer, Channel> incomingChannels;
-	private Map<ChildServer, Channel> outgoingChannels;
-	private Map<ChildServer, String> incomingChannelNames;
-	private Map<ChildServer, String> outgoingChannelNames;
-	private RabbitInputHandler inputHandler;
+	private Map<ConnectedServer, Channel> incomingChannels;
+	private Map<ConnectedServer, Channel> outgoingChannels;
+	private Map<ConnectedServer, String> incomingChannelNames;
+	private Map<ConnectedServer, String> outgoingChannelNames;
+	private AbstractRabbitInputHandler inputHandler;
 
-	public RabbitGateway(ConnectionFactory connFac, Map<ChildServer, String> incomingQueues,
-			Map<ChildServer, String> outgoingQueues, Logger logger) {
+	public RabbitGateway(ConnectionFactory connFac, Map<ConnectedServer, String> incomingQueues,
+			Map<ConnectedServer, String> outgoingQueues, Logger logger) {
 		this.connectionFactory = connFac;
 		this.incomingChannelNames = incomingQueues;
 		this.outgoingChannelNames = outgoingQueues;
 		this.logger = logger;
-		this.inputHandler = new RabbitInputHandler(logger);
+		this.inputHandler = new ZeusRabbitInputHandler(new TransactionIdManager("zeus"), logger);
 		instance = this;
 	}
 
 	public void beginAsyncListen() {
-		for (ChildServer server : incomingChannelNames.keySet()) {
+		for (ConnectedServer server : incomingChannelNames.keySet()) {
 			new Thread(() -> {
 				logger.info("Beginning to listen for rabbit input...");
 				DeliverCallback deliverCallback = (consumerTag, delivery) -> {
@@ -76,7 +78,7 @@ public class RabbitGateway {
 		}
 	}
 
-	private boolean sendMessage(String server, String msg) {
+	private boolean sendMessage(ConnectedServer server, String msg) {
 		Channel chan = outgoingChannels.get(server);
 		if (chan == null) {
 			return false;
@@ -90,26 +92,26 @@ public class RabbitGateway {
 		}
 	}
 
-	public boolean sendMessage(ChildServer server, JSONObject json) {
-		return sendMessage(server.getID(), json.toString());
+	public boolean sendMessage(ConnectedServer server, JSONObject json) {
+		return sendMessage(server, json.toString());
 	}
 
-	public void broadcastMessage(Collection<ChildServer> servers, JSONObject json) {
-		for (ChildServer server : servers) {
+	public void broadcastMessage(Collection<ConnectedServer> servers, JSONObject json) {
+		for (ConnectedServer server : servers) {
 			//not reusing the package, because each will have a different transaction id
-			sendMessage(server.getID(), json.toString());
+			sendMessage(server, json.toString());
 		}
 	}
 
 	public boolean setup() {
 		try {
 			conn = connectionFactory.newConnection();
-			for (Entry<String, String> entry : incomingChannelNames.entrySet()) {
+			for (Entry<ConnectedServer, String> entry : incomingChannelNames.entrySet()) {
 				Channel incomingChannel = conn.createChannel();
 				incomingChannel.queueDeclare(entry.getValue(), false, false, false, null);
 				incomingChannels.put(entry.getKey(), incomingChannel);
 			}
-			for (Entry<String, String> entry : outgoingChannelNames.entrySet()) {
+			for (Entry<ConnectedServer, String> entry : outgoingChannelNames.entrySet()) {
 				Channel outgoingChannel = conn.createChannel();
 				outgoingChannel.queueDeclare(entry.getValue(), false, false, false, null);
 				outgoingChannels.put(entry.getKey(), outgoingChannel);

@@ -1,6 +1,6 @@
 package com.github.civcraft.zeus.rabbit;
 
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 /**
  * Uniquely identifies a single conversation between server and client
@@ -8,12 +8,12 @@ import com.github.civcraft.zeus.servers.ChildServer;
  */
 public abstract class PacketSession {
 	
-	private final ChildServer source;
+	private final ConnectedServer source;
 	private final String transactionID;
 	private final long creationTime;
 	private long lastUpdate;
 	
-	public PacketSession(ChildServer source, String transactionID) {
+	public PacketSession(ConnectedServer source, String transactionID) {
 		this.source = source;
 		this.transactionID = transactionID;
 		this.creationTime = System.currentTimeMillis();
@@ -40,7 +40,7 @@ public abstract class PacketSession {
 		return creationTime;
 	}
 	
-	public ChildServer getServerID() {
+	public ConnectedServer getServerID() {
 		return this.source;
 	}
 	

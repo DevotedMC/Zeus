@@ -6,30 +6,34 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.civcraft.zeus.servers.ChildServer;
+import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class BroadcastInterestTracker {
 
-	private Map<String, Set<ChildServer>> servers;
+	private Map<String, Set<ConnectedServer>> servers;
 
 	public BroadcastInterestTracker() {
 		this.servers = new HashMap<>();
 	}
 
-	Set<ChildServer> getLocalSet(String interest) {
+	private Set<ConnectedServer> getLocalSet(String interest) {
 		return servers.computeIfAbsent(interest, s -> new HashSet<>());
 	}
 
-	public void addInterest(ChildServer server, String interest) {
+	public synchronized void addInterest(ConnectedServer server, String interest) {
 		getLocalSet(interest).add(server);
 	}
 
-	public boolean removeInterest(ChildServer server, String interest) {
+	public synchronized boolean removeInterest(ConnectedServer server, String interest) {
 		return getLocalSet(interest).remove(server);
 	}
 	
-	public Set<ChildServer> getInterestedServers(String interest) {
+	public synchronized Set<ConnectedServer> getInterestedServers(String interest) {
 		return Collections.unmodifiableSet(getLocalSet(interest));
+	}
+	
+	public synchronized void broadcastMessage(String interest, RabbitMessage message) {
+		RabbitGateway.getInstance().broadcastMessage(getInterestedServers(interest), message.getJSON());
 	}
 
 }

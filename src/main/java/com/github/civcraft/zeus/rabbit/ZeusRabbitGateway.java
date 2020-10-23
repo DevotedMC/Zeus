@@ -2,6 +2,8 @@ package com.github.civcraft.zeus.rabbit;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
@@ -21,12 +23,20 @@ import com.rabbitmq.client.DeliverCallback;
  * This class is the glue between our application logic and RabbitMQ
  *
  */
-public class RabbitGateway {
+public class ZeusRabbitGateway {
 
-	private static RabbitGateway instance;
+	private static ZeusRabbitGateway instance;
 
-	public static RabbitGateway getInstance() {
+	public static ZeusRabbitGateway getInstance() {
 		return instance;
+	}
+	
+	public static String getChannelToZeus(String clientName) {
+		return clientName + "_up";
+	}
+	
+	public static String getChannelFromZeus(String clientName) {
+		return clientName + "_down";
 	}
 
 	private ConnectionFactory connectionFactory;
@@ -34,22 +44,21 @@ public class RabbitGateway {
 	private Connection conn;
 	private Map<ConnectedServer, Channel> incomingChannels;
 	private Map<ConnectedServer, Channel> outgoingChannels;
-	private Map<ConnectedServer, String> incomingChannelNames;
-	private Map<ConnectedServer, String> outgoingChannelNames;
+	private List<ConnectedServer> connectedServers;
 	private AbstractRabbitInputHandler inputHandler;
 
-	public RabbitGateway(ConnectionFactory connFac, Map<ConnectedServer, String> incomingQueues,
-			Map<ConnectedServer, String> outgoingQueues, Logger logger) {
+	public ZeusRabbitGateway(ConnectionFactory connFac, List <ConnectedServer> connectedServers, Logger logger) {
 		this.connectionFactory = connFac;
-		this.incomingChannelNames = incomingQueues;
-		this.outgoingChannelNames = outgoingQueues;
 		this.logger = logger;
+		this.connectedServers = connectedServers;
 		this.inputHandler = new ZeusRabbitInputHandler(new TransactionIdManager("zeus"), logger);
+		this.incomingChannels = new HashMap<>();
+		this.outgoingChannels = new HashMap<>();
 		instance = this;
 	}
 
 	public void beginAsyncListen() {
-		for (ConnectedServer server : incomingChannelNames.keySet()) {
+		for (ConnectedServer server : connectedServers) {
 			new Thread(() -> {
 				logger.info("Beginning to listen for rabbit input...");
 				DeliverCallback deliverCallback = (consumerTag, delivery) -> {
@@ -68,7 +77,7 @@ public class RabbitGateway {
 				};
 				try {
 					Channel incChannel = incomingChannels.get(server);
-					incChannel.basicConsume(server.getID(), true, deliverCallback,
+					incChannel.basicConsume(getChannelToZeus(server.getID()), true, deliverCallback,
 							consumerTag -> {
 							});
 				} catch (Exception e) {
@@ -84,7 +93,7 @@ public class RabbitGateway {
 			return false;
 		}
 		try {
-			chan.basicPublish("", outgoingChannelNames.get(server), null, msg.getBytes("UTF-8"));
+			chan.basicPublish("", getChannelFromZeus(server.getID()), null, msg.getBytes("UTF-8"));
 			return true;
 		} catch (Exception e) {
 			logger.error("Failed to send rabbit message", e);
@@ -106,15 +115,15 @@ public class RabbitGateway {
 	public boolean setup() {
 		try {
 			conn = connectionFactory.newConnection();
-			for (Entry<ConnectedServer, String> entry : incomingChannelNames.entrySet()) {
+			for (ConnectedServer server : connectedServers) {
 				Channel incomingChannel = conn.createChannel();
-				incomingChannel.queueDeclare(entry.getValue(), false, false, false, null);
-				incomingChannels.put(entry.getKey(), incomingChannel);
+				incomingChannel.queueDeclare(getChannelToZeus(server.getID()), false, false, false, null);
+				incomingChannels.put(server, incomingChannel);
 			}
-			for (Entry<ConnectedServer, String> entry : outgoingChannelNames.entrySet()) {
+			for (ConnectedServer server : connectedServers) {
 				Channel outgoingChannel = conn.createChannel();
-				outgoingChannel.queueDeclare(entry.getValue(), false, false, false, null);
-				outgoingChannels.put(entry.getKey(), outgoingChannel);
+				outgoingChannel.queueDeclare(getChannelFromZeus(server.getID()), false, false, false, null);
+				outgoingChannels.put(server, outgoingChannel);
 			}
 			return true;
 		} catch (IOException | TimeoutException e) {

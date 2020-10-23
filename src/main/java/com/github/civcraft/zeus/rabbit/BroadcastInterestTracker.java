@@ -33,7 +33,7 @@ public class BroadcastInterestTracker {
 	}
 	
 	public synchronized void broadcastMessage(String interest, RabbitMessage message) {
-		RabbitGateway.getInstance().broadcastMessage(getInterestedServers(interest), message.getJSON());
+		ZeusRabbitGateway.getInstance().broadcastMessage(getInterestedServers(interest), message.getJSON());
 	}
 
 }

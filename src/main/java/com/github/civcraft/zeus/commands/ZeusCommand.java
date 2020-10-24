@@ -1,7 +1,5 @@
 package com.github.civcraft.zeus.commands;
 
-import java.util.List;
-
 import org.apache.logging.log4j.Logger;
 
 import com.github.civcraft.zeus.ZeusMain;

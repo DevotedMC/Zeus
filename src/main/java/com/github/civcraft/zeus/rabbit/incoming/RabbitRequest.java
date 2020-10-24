@@ -1,7 +1,5 @@
 package com.github.civcraft.zeus.rabbit.incoming;
 
-import java.util.function.Supplier;
-
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 

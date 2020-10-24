@@ -2,7 +2,6 @@ package com.github.civcraft.zeus.model;
 
 import java.util.UUID;
 
-import com.github.civcraft.zeus.servers.ConnectedServer;
 import com.google.common.base.Preconditions;
 
 public class PlayerData {

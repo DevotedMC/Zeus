@@ -3,7 +3,6 @@ package com.github.civcraft.zeus.rabbit.abstr;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 

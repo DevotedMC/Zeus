@@ -4,12 +4,12 @@ import com.google.common.base.Preconditions;
 
 public class ConnectedMapState {
 	
-	private Location upperLeftCorner;
+	private ZeusLocation upperLeftCorner;
 	private String world;
 	private int xSize;
 	private int zSize;
 	
-	public ConnectedMapState(String world, Location upperLeftCorner, int xSize, int zSize) {
+	public ConnectedMapState(String world, ZeusLocation upperLeftCorner, int xSize, int zSize) {
 		Preconditions.checkNotNull(world);
 		Preconditions.checkNotNull(upperLeftCorner);
 		Preconditions.checkArgument(xSize > 0);
@@ -20,7 +20,7 @@ public class ConnectedMapState {
 		this.zSize = zSize;
 	}
 	
-	public Location getUpperLeftCorner() {
+	public ZeusLocation getUpperLeftCorner() {
 		return upperLeftCorner;
 	}
 	
@@ -28,7 +28,7 @@ public class ConnectedMapState {
 		return world;
 	}
 	
-	public boolean isInside(Location location) {
+	public boolean isInside(ZeusLocation location) {
 		return isInside(location.getX(), location.getZ());
 	}
 	

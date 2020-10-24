@@ -1,7 +1,5 @@
 package com.github.civcraft.zeus.rabbit.incoming;
 
-import java.util.function.Supplier;
-
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.rabbit.PacketSession;

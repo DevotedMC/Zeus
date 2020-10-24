@@ -3,7 +3,6 @@ package com.github.civcraft.zeus.rabbit.incoming.artemis;
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.model.TransferRejectionReason;
-import com.github.civcraft.zeus.rabbit.PacketSession;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.sessions.PlayerTransferSession;

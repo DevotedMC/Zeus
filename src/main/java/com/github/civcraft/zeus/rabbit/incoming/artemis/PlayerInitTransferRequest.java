@@ -5,13 +5,10 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
-import com.github.civcraft.zeus.model.CardinalDirection;
-import com.github.civcraft.zeus.model.Location;
+import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.model.TransferRejectionReason;
-import com.github.civcraft.zeus.rabbit.PacketSession;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.incoming.ParsingUtils;
-import com.github.civcraft.zeus.rabbit.incoming.RabbitRequest;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerRequest;
 import com.github.civcraft.zeus.rabbit.sessions.PlayerTransferSession;
@@ -45,7 +42,7 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 		}
 		ArtemisServer sourceServer = (ArtemisServer) sendingServer;
 		connState.setSourceServer(sourceServer);
-		Location loc = ParsingUtils.parseLocation(data.getJSONObject("loc"));
+		ZeusLocation loc = ZeusLocation.parseLocation(data.getJSONObject("loc"));
 		ArtemisServer targetServer = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(sourceServer,
 				 loc);
 		if (targetServer == null) {

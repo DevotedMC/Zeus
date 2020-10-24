@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
-import com.github.civcraft.zeus.model.Location;
+import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.google.common.base.Preconditions;
 
@@ -15,9 +15,9 @@ import com.google.common.base.Preconditions;
 public class SendPlayerRequest extends RabbitMessage {
 
 	private UUID player;
-	private Location location;
+	private ZeusLocation location;
 	
-	public SendPlayerRequest(String transactionID, UUID player, Location location) {
+	public SendPlayerRequest(String transactionID, UUID player, ZeusLocation location) {
 		super(transactionID);
 		Preconditions.checkNotNull(player);
 		Preconditions.checkNotNull(location);

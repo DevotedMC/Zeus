@@ -5,10 +5,9 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
-import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.model.TransferRejectionReason;
+import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
-import com.github.civcraft.zeus.rabbit.incoming.ParsingUtils;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerRequest;
 import com.github.civcraft.zeus.rabbit.sessions.PlayerTransferSession;

@@ -5,6 +5,7 @@ import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
@@ -12,14 +13,15 @@ import java.util.UUID;
 import org.apache.logging.log4j.Logger;
 
 import com.github.civcraft.zeus.model.PlayerNBT;
+import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
-public class DAO {
+public class ZeusDAO {
 	
 	private DBConnection db;
 	private Logger logger;
 
-	public DAO(DBConnection connection, Logger logger) {
+	public ZeusDAO(DBConnection connection, Logger logger) {
 		this.logger = logger;
 		this.db = connection;
 		if (!createTables()) {
@@ -107,6 +109,28 @@ public class DAO {
 			return blob.getBytes(1L, (int) blob.length());
 		} catch (SQLException e) {
 			logger.error("Failed to load and lock player data", e);
+			return null;
+		}
+	}
+	
+	public ZeusLocation getLocation(UUID uuid) {
+		try (Connection conn = db.getConnection();
+				PreparedStatement 
+				prep = conn.prepareStatement("select world, loc_x, loc_y, loc_z from player where uuid = ?;")) {
+			prep.setObject(1, uuid);
+			try (ResultSet rs = prep.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				String world = rs.getString(1);
+				double x = rs.getDouble(2);
+				double y = rs.getDouble(3);
+				double z = rs.getDouble(4);
+				return new ZeusLocation(world, x, y, z);
+			}
+			
+		} catch (SQLException e) {
+			logger.error("Failed to load player location", e);
 			return null;
 		}
 	}

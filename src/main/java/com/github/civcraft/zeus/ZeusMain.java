@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.civcraft.zeus.commands.ZeusCommandHandler;
 import com.github.civcraft.zeus.commands.sender.ConsoleSender;
+import com.github.civcraft.zeus.database.ZeusDAO;
 import com.github.civcraft.zeus.model.GlobalPlayerData;
 import com.github.civcraft.zeus.model.PlayerManager;
 import com.github.civcraft.zeus.model.TransactionIdManager;
@@ -35,6 +36,7 @@ public class ZeusMain {
 	private ZeusCommandHandler commandHandler;
 	private ZeusRabbitGateway rabbitGateway;
 	private ZeusConfigManager configManager;
+	private ZeusDAO dao;
 	private boolean isRunning = true;
 
 	private ZeusMain() {
@@ -108,6 +110,10 @@ public class ZeusMain {
 
 	public ZeusRabbitGateway getRabbitGateway() {
 		return rabbitGateway;
+	}
+	
+	public ZeusDAO getDAO() {
+		return dao;
 	}
 
 	public ServerPlacementManager getServerPlacementManager() {

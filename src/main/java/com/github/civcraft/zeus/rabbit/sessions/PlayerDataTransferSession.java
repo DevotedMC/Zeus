@@ -3,18 +3,15 @@ package com.github.civcraft.zeus.rabbit.sessions;
 import java.util.UUID;
 
 import com.github.civcraft.zeus.model.ZeusLocation;
-import com.github.civcraft.zeus.rabbit.PacketSession;
+import com.github.civcraft.zeus.rabbit.PlayerSpecificPacketSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
-public class PlayerDataTransferSession extends PacketSession {
-	
-	private UUID player;
+public class PlayerDataTransferSession extends PlayerSpecificPacketSession {
 	private byte [] data;
 	private ZeusLocation location;
 
 	public PlayerDataTransferSession(ConnectedServer source, String transactionID, UUID player) {
-		super(source, transactionID);
-		this.player = player;
+		super(source, transactionID, player);
 	}
 	
 	public void setData(byte [] data, ZeusLocation location) {

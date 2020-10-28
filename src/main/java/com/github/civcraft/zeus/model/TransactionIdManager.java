@@ -30,8 +30,8 @@ public class TransactionIdManager {
 		activeSessions.remove(id);
 	}
 	
-	public void putSession(String id, PacketSession session) {
-		activeSessions.put(id, session);
+	public void putSession(PacketSession session) {
+		activeSessions.put(session.getTransactionID(), session);
 	}
 
 }

@@ -25,8 +25,8 @@ public abstract class RabbitMessage {
 	 */
 	public JSONObject getJSON() {
 		JSONObject json = new JSONObject();
-		json.put("type", getIdentifier());
-		json.put("transaction_id", transactionID);
+		json.put("%%type", getIdentifier());
+		json.put("%%transaction_id", transactionID);
 		enrichJson(json);
 		return json;
 	}

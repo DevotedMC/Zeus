@@ -4,23 +4,24 @@ import org.json.JSONObject;
 
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
-public class RejectPlayerDataRequest extends RabbitMessage {
+public class RejectPlayerInitialLogin extends RabbitMessage {
 	
-	public static final String ID = "reject_player_initial_login";
+	private String reason;
 
-	public RejectPlayerDataRequest(String transactionID) {
+	public RejectPlayerInitialLogin(String transactionID, String reason) {
 		super(transactionID);
+		this.reason = reason;
 	}
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		//session id is identifier enough
+		json.put("reason", reason);
 	}
 
 	@Override
 	public String getIdentifier() {
-		return ID;
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
 
 }

@@ -39,7 +39,7 @@ public abstract class AbstractRabbitInputHandler {
 			logError("Received invalid json " +  e.toString());
 			return;
 		}
-		String type = input.getString("type");
+		String type = input.getString("%%type");
 		if (type == null) {
 			logError("Input " + input.toString() + " had no type");
 			return;
@@ -53,7 +53,7 @@ public abstract class AbstractRabbitInputHandler {
 			command.handle(null, sourceServer, input);
 			return;
 		}
-		String transactionID = input.optString("transaction_id", "");
+		String transactionID = input.optString("%%transaction_id", "");
 		if (transactionID.isEmpty()) {
 			logError("Expected transaction id in packet of type " + type + ", but found none");
 			return;

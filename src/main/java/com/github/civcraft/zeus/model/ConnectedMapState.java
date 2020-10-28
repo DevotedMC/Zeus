@@ -5,16 +5,13 @@ import com.google.common.base.Preconditions;
 public class ConnectedMapState {
 	
 	private ZeusLocation upperLeftCorner;
-	private String world;
 	private int xSize;
 	private int zSize;
 	
-	public ConnectedMapState(String world, ZeusLocation upperLeftCorner, int xSize, int zSize) {
-		Preconditions.checkNotNull(world);
+	public ConnectedMapState(ZeusLocation upperLeftCorner, int xSize, int zSize) {
 		Preconditions.checkNotNull(upperLeftCorner);
 		Preconditions.checkArgument(xSize > 0);
 		Preconditions.checkArgument(zSize > 0);
-		this.world = world;
 		this.upperLeftCorner = upperLeftCorner;
 		this.xSize = xSize;
 		this.zSize = zSize;
@@ -25,7 +22,15 @@ public class ConnectedMapState {
 	}
 	
 	public String getWorld() {
-		return world;
+		return upperLeftCorner.getWorld();
+	}
+	
+	public int getXSize() {
+		return xSize;
+	}
+	
+	public int getZSize() {
+		return zSize;
 	}
 	
 	public boolean isInside(ZeusLocation location) {

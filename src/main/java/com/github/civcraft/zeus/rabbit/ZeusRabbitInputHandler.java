@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.civcraft.zeus.model.TransactionIdManager;
 import com.github.civcraft.zeus.rabbit.abstr.AbstractRabbitInputHandler;
+import com.github.civcraft.zeus.rabbit.incoming.apollo.PlayerLoginRequest;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerDataRequestHandler;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerDataTargetConfirm;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerInitTransferRequest;
@@ -22,7 +23,7 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 	@Override
 	protected void registerCommands() {
 		//apollo
-		registerCommand(new PlayerLocationRequest());
+		registerCommand(new PlayerLoginRequest());
 		
 		//artemis
 		registerCommand(new PlayerDataRequestHandler());

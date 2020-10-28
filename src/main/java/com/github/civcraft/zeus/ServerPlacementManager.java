@@ -8,5 +8,9 @@ public class ServerPlacementManager {
 	public ArtemisServer getTargetServer(ArtemisServer source, ZeusLocation location) {
 		return null; //TODO
 	}
+	
+	public ArtemisServer getTargetServer(ZeusLocation location) {
+		return null; //TODO
+	}
 
 }

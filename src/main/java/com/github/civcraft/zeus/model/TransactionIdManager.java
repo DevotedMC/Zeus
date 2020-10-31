@@ -19,7 +19,7 @@ public class TransactionIdManager {
 	}
 	
 	public String pullNewTicket() {
-		return identifier + localCounter.incrementAndGet();
+		return identifier + "_" + localCounter.incrementAndGet();
 	}
 	
 	public PacketSession getSession(String id) {

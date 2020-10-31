@@ -15,6 +15,14 @@ public abstract class GenericInteractiveRabbitCommand extends InteractiveRabbitC
 	protected GenericSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		return new GenericSession(source, transactionID);
 	}
+	
+	@Override
+	public boolean handleRequest(GenericSession connState, ConnectedServer sendingServer, JSONObject data) {
+		handleRequest(sendingServer, data);
+		return true;
+	}
+	
+	public abstract void handleRequest(ConnectedServer sendingServer, JSONObject data);
 
 }
 

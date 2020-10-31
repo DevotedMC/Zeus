@@ -23,9 +23,10 @@ public abstract class AbstractRabbitInputHandler {
 	public AbstractRabbitInputHandler(TransactionIdManager transactionManager) {
 		this.commands = new HashMap<>();
 		this.transactionManager = transactionManager;
+		registerCommands();
 	}
 
-	protected  abstract void registerCommands();
+	protected abstract void registerCommands();
 
 	protected void registerCommand(RabbitRequest command) {
 		this.commands.put(command.getIdentifier(), command);

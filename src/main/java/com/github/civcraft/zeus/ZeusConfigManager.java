@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.github.civcraft.zeus.database.DBConnection;
 import com.github.civcraft.zeus.servers.ApolloServer;
 import com.github.civcraft.zeus.servers.ArtemisServer;
 import com.github.civcraft.zeus.servers.ConnectedServer;
@@ -21,6 +22,7 @@ public class ZeusConfigManager {
 	private static final String configFileName = "config.json";
 	private JSONObject config;
 	private Logger logger;
+	private boolean debugRabbit;
 
 	public ZeusConfigManager(Logger logger) {
 		this.logger = logger;
@@ -31,10 +33,31 @@ public class ZeusConfigManager {
 		try {
 			Files.readAllLines(new File(configFileName).toPath()).forEach(sb::append);
 			config = new JSONObject(sb.toString());
+			parse();
 			return true;
 		} catch (IOException | JSONException e) {
 			logger.error("Failed to load config file", e);
 			return false;
+		}
+	}
+	
+	private void parse() {
+		debugRabbit = config.getJSONObject("rabbitmq").optBoolean("debug", true);
+	}
+	
+	public DBConnection getDatabase() {
+		try {
+			JSONObject json = config.getJSONObject("database");
+			String user = json.optString("user", "root");
+			String password = json.optString("password", null);
+			String host = json.optString("host", "localhost");
+			int port = json.getInt("port");
+			String database = json.getString("database");
+			int poolSize = json.optInt("pool_size", 5);
+			return new DBConnection(logger, user, password, host, port, database, poolSize, 10000, 600000, 1800000);
+		} catch (JSONException e) {
+			logger.error("Failed to parse db credentials", e);
+			return null;
 		}
 	}
 	
@@ -63,6 +86,10 @@ public class ZeusConfigManager {
 			logger.error("Failed to parse rabbit credentials", e);
 			return null;
 		}
+	}
+	
+	public boolean debugRabbit() {
+		return debugRabbit;
 	}
 	
 	public List<ConnectedServer> parseClientServers() {

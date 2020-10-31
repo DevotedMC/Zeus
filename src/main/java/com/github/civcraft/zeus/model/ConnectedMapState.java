@@ -1,5 +1,6 @@
 package com.github.civcraft.zeus.model;
 
+import com.github.civcraft.zeus.servers.ArtemisServer;
 import com.google.common.base.Preconditions;
 
 public class ConnectedMapState {
@@ -7,14 +8,20 @@ public class ConnectedMapState {
 	private ZeusLocation upperLeftCorner;
 	private int xSize;
 	private int zSize;
+	private ArtemisServer server;
 	
-	public ConnectedMapState(ZeusLocation upperLeftCorner, int xSize, int zSize) {
+	public ConnectedMapState(ArtemisServer server, ZeusLocation upperLeftCorner, int xSize, int zSize) {
 		Preconditions.checkNotNull(upperLeftCorner);
 		Preconditions.checkArgument(xSize > 0);
 		Preconditions.checkArgument(zSize > 0);
 		this.upperLeftCorner = upperLeftCorner;
 		this.xSize = xSize;
 		this.zSize = zSize;
+		this.server = server;
+	}
+	
+	public ArtemisServer getServer() {
+		return server;
 	}
 	
 	public ZeusLocation getUpperLeftCorner() {
@@ -34,6 +41,9 @@ public class ConnectedMapState {
 	}
 	
 	public boolean isInside(ZeusLocation location) {
+		if (!location.getWorld().equals(upperLeftCorner.getWorld())) {
+			return false;
+		}
 		return isInside(location.getX(), location.getZ());
 	}
 	
@@ -47,6 +57,17 @@ public class ConnectedMapState {
 			return false;
 		}
 		return true;
+	}
+	
+	public int hashCode() {
+		return server.hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if (!(o instanceof ConnectedMapState)) {
+			return false;
+		}
+		return ((ConnectedMapState) o).server.equals(server);		
 	}
 
 }

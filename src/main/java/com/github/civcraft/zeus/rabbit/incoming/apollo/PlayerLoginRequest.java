@@ -14,6 +14,8 @@ import com.github.civcraft.zeus.servers.ArtemisServer;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLoginSession> {
+	
+	public static final String ID = "initial_login_request";
 
 	@Override
 	public boolean handleRequest(ZeusPlayerLoginSession connState, ConnectedServer sendingServer, JSONObject data) {
@@ -30,7 +32,7 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 
 	@Override
 	public String getIdentifier() {
-		return "initial_login_request";
+		return ID;
 	}
 
 	@Override

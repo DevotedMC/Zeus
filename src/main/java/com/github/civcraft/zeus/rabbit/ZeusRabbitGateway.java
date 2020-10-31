@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.model.TransactionIdManager;
 import com.github.civcraft.zeus.rabbit.abstr.AbstractRabbitInputHandler;
 import com.github.civcraft.zeus.servers.ConnectedServer;
@@ -29,11 +30,11 @@ public class ZeusRabbitGateway {
 	public static ZeusRabbitGateway getInstance() {
 		return instance;
 	}
-	
+
 	public static String getChannelToZeus(String clientName) {
 		return clientName + "_up";
 	}
-	
+
 	public static String getChannelFromZeus(String clientName) {
 		return clientName + "_down";
 	}
@@ -46,7 +47,7 @@ public class ZeusRabbitGateway {
 	private List<ConnectedServer> connectedServers;
 	private AbstractRabbitInputHandler inputHandler;
 
-	public ZeusRabbitGateway(ConnectionFactory connFac, List <ConnectedServer> connectedServers, Logger logger) {
+	public ZeusRabbitGateway(ConnectionFactory connFac, List<ConnectedServer> connectedServers, Logger logger) {
 		this.connectionFactory = connFac;
 		this.logger = logger;
 		this.connectedServers = connectedServers;
@@ -59,11 +60,13 @@ public class ZeusRabbitGateway {
 	public void beginAsyncListen() {
 		for (ConnectedServer server : connectedServers) {
 			new Thread(() -> {
-				logger.info("Beginning to listen for rabbit input...");
+				logger.info("Beginning to listen for rabbit input from " + server.getID());
 				DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 					try {
 						String message = new String(delivery.getBody(), "UTF-8");
-						System.out.println(" [x] Received '" + message + "'");
+						if (ZeusMain.getInstance().getConfigManager().debugRabbit()) {
+							logger.info("[X] R_IN [" + server.getID() + "]: " + message);
+						}
 						// here we just do single threaded handling per server, forwarding to a
 						// threadpool would be
 						// possible as well and desired in a scalable system
@@ -76,9 +79,8 @@ public class ZeusRabbitGateway {
 				};
 				try {
 					Channel incChannel = incomingChannels.get(server);
-					incChannel.basicConsume(getChannelToZeus(server.getID()), true, deliverCallback,
-							consumerTag -> {
-							});
+					incChannel.basicConsume(getChannelToZeus(server.getID()), true, deliverCallback, consumerTag -> {
+					});
 				} catch (Exception e) {
 					logger.error("Error in rabbit listener", e);
 				}
@@ -92,6 +94,9 @@ public class ZeusRabbitGateway {
 			return false;
 		}
 		try {
+			if (ZeusMain.getInstance().getConfigManager().debugRabbit()) {
+				logger.info("[X] R_OUT [" + server.getID() + "]: " + msg);
+			}
 			chan.basicPublish("", getChannelFromZeus(server.getID()), null, msg.getBytes("UTF-8"));
 			return true;
 		} catch (Exception e) {
@@ -106,7 +111,7 @@ public class ZeusRabbitGateway {
 
 	public void broadcastMessage(Collection<ConnectedServer> servers, JSONObject json) {
 		for (ConnectedServer server : servers) {
-			//not reusing the package, because each will have a different transaction id
+			// not reusing the package, because each will have a different transaction id
 			sendMessage(server, json.toString());
 		}
 	}

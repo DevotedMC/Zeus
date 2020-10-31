@@ -48,6 +48,11 @@ public class ZeusMain {
 			logger.error("Failed to load config, exiting");
 			System.exit(0);
 		}
+		this.dao = new ZeusDAO(configManager.getDatabase(), logger);
+		if (!dao.createTables()) {
+			logger.error("Failed to init DB, shutting down");
+			System.exit(0);
+		}
 		this.broadcastInterestTracker = new BroadcastInterestTracker();
 		this.serverManager = new ServerManager();
 		this.serverPlacementManager = new ServerPlacementManager();
@@ -78,6 +83,7 @@ public class ZeusMain {
 			logger.warn("System console not detected, using scanner as fallback behavior");
 			scanner = new Scanner(System.in);
 		}
+		logger.info("Started listening for console input");
 		while (isRunning) {
 			String msg;
 			if (c == null) {
@@ -93,6 +99,7 @@ public class ZeusMain {
 	}
 
 	public void shutDown() {
+		rabbitGateway.shutdown();
 		isRunning = false;
 	}
 
@@ -122,6 +129,10 @@ public class ZeusMain {
 
 	public PlayerManager<GlobalPlayerData> getPlayerDataManager() {
 		return playerDataManager;
+	}
+	
+	public ZeusConfigManager getConfigManager() {
+		return configManager;
 	}
 
 	public Logger getLogger() {

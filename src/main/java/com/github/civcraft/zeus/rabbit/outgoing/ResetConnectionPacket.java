@@ -9,6 +9,8 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
  *
  */
 public class ResetConnectionPacket extends RabbitMessage {
+	
+	public static String ID = "reset_connection";
 
 	public ResetConnectionPacket(String transactionID) {
 		super(transactionID);
@@ -20,7 +22,7 @@ public class ResetConnectionPacket extends RabbitMessage {
 
 	@Override
 	public String getIdentifier() {
-		return "reset_connection";
+		return ID;
 	}
 
 }

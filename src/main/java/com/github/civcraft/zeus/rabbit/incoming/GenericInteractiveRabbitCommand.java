@@ -18,11 +18,11 @@ public abstract class GenericInteractiveRabbitCommand extends InteractiveRabbitC
 	
 	@Override
 	public boolean handleRequest(GenericSession connState, ConnectedServer sendingServer, JSONObject data) {
-		handleRequest(sendingServer, data);
+		handleRequest(connState.getTransactionID(), sendingServer, data);
 		return true;
 	}
 	
-	public abstract void handleRequest(ConnectedServer sendingServer, JSONObject data);
+	public abstract void handleRequest(String ticket, ConnectedServer sendingServer, JSONObject data);
 
 }
 

@@ -6,6 +6,8 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
 public class RejectPlayerInitialLogin extends RabbitMessage {
 	
+	public static final String ID = "reject_initial_login";
+	
 	private String reason;
 
 	public RejectPlayerInitialLogin(String transactionID, String reason) {
@@ -20,8 +22,7 @@ public class RejectPlayerInitialLogin extends RabbitMessage {
 
 	@Override
 	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
+		return ID;
 	}
 
 }

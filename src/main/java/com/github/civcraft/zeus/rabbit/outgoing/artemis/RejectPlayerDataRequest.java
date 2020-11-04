@@ -6,7 +6,7 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
 public class RejectPlayerDataRequest extends RabbitMessage {
 	
-	public static final String ID = "reject_player_initial_login";
+	public static final String ID = "reject_player_data_request";
 
 	public RejectPlayerDataRequest(String transactionID) {
 		super(transactionID);

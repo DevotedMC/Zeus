@@ -1,6 +1,7 @@
 package com.github.civcraft.zeus.rabbit;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.model.TransactionIdManager;
 import com.github.civcraft.zeus.rabbit.abstr.AbstractRabbitInputHandler;
+import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -47,10 +49,10 @@ public class ZeusRabbitGateway {
 	private List<ConnectedServer> connectedServers;
 	private AbstractRabbitInputHandler inputHandler;
 
-	public ZeusRabbitGateway(ConnectionFactory connFac, List<ConnectedServer> connectedServers, Logger logger) {
+	public ZeusRabbitGateway(ConnectionFactory connFac, Collection<ConnectedServer> connectedServers, Logger logger) {
 		this.connectionFactory = connFac;
 		this.logger = logger;
-		this.connectedServers = connectedServers;
+		this.connectedServers = new ArrayList<>(connectedServers);
 		this.inputHandler = new ZeusRabbitInputHandler(new TransactionIdManager("zeus"), logger);
 		this.incomingChannels = new HashMap<>();
 		this.outgoingChannels = new HashMap<>();
@@ -69,7 +71,7 @@ public class ZeusRabbitGateway {
 						}
 						// here we just do single threaded handling per server, forwarding to a
 						// threadpool would be
-						// possible as well and desired in a scalable system
+						// possible as well and maybe desired in a scalable system
 						inputHandler.handle(server, message);
 					} catch (Exception e) {
 						// if we dont do this the exception falls back into rabbit, which causes tons of
@@ -115,8 +117,15 @@ public class ZeusRabbitGateway {
 			sendMessage(server, json.toString());
 		}
 	}
+	
+	public void broadcastToAll(JSONObject json) {
+		for (ConnectedServer server : this.connectedServers) {
+			sendMessage(server, json.toString());
+		}
+	}
 
 	public boolean setup() {
+		InteractiveRabbitCommand.setSendingLambda((s,p) -> sendMessage(s,p.getJSON()));	
 		try {
 			conn = connectionFactory.newConnection();
 			for (ConnectedServer server : connectedServers) {

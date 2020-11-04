@@ -14,6 +14,7 @@ import com.github.civcraft.zeus.model.PlayerManager;
 import com.github.civcraft.zeus.model.TransactionIdManager;
 import com.github.civcraft.zeus.rabbit.BroadcastInterestTracker;
 import com.github.civcraft.zeus.rabbit.ZeusRabbitGateway;
+import com.github.civcraft.zeus.rabbit.outgoing.ResetConnectionPacket;
 
 public class ZeusMain {
 
@@ -54,7 +55,7 @@ public class ZeusMain {
 			System.exit(0);
 		}
 		this.broadcastInterestTracker = new BroadcastInterestTracker();
-		this.serverManager = new ServerManager();
+		this.serverManager = new ServerManager(configManager.parseClientServers());
 		this.serverPlacementManager = new ServerPlacementManager();
 		this.transactionIdManager = new TransactionIdManager("zeus");
 		this.playerDataManager = new PlayerManager<>();
@@ -67,12 +68,13 @@ public class ZeusMain {
 	}
 
 	private boolean startRabbit() {
-		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), configManager.parseClientServers(),
+		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(),
 				logger);
 		if (!rabbitGateway.setup()) {
 			return false;
 		}
 		rabbitGateway.beginAsyncListen();
+		rabbitGateway.broadcastToAll(new ResetConnectionPacket(transactionIdManager.pullNewTicket()).getJSON());
 		return true;
 	}
 

@@ -9,6 +9,8 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.github.civcraft.zeus.util.Base64Encoder;
 
 public class SendPlayerData extends RabbitMessage {
+	
+	public static final String ID = "send_player_data";
 
 	private UUID player;
 	private byte [] data;
@@ -23,15 +25,23 @@ public class SendPlayerData extends RabbitMessage {
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		JSONObject obj = new JSONObject();
-		location.writeToJson(obj);
-		json.put("loc", obj);
+		if (data.length == 0) {
+			json.put("new_player", true);
+		}
+		else {
+			json.put("data", Base64Encoder.encode(data));
+		}
+		if (location != null) {
+			JSONObject obj = new JSONObject();
+			location.writeToJson(obj);
+			json.put("loc", obj);
+		}
 		json.put("player", player.toString());
-		json.put("data", Base64Encoder.encode(data));
+		
 	}
 
 	@Override
 	public String getIdentifier() {
-		return "send_player_data";
+		return ID;
 	}
 }

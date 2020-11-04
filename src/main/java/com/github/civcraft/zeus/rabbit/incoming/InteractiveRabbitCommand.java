@@ -1,5 +1,7 @@
 package com.github.civcraft.zeus.rabbit.incoming;
 
+import java.util.function.BiConsumer;
+
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
@@ -9,6 +11,12 @@ import com.github.civcraft.zeus.rabbit.ZeusRabbitGateway;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public abstract class InteractiveRabbitCommand<S extends PacketSession> extends RabbitRequest {
+	
+	private static BiConsumer<ConnectedServer, RabbitMessage> sendLambda;
+	
+	public static void setSendingLambda(BiConsumer<ConnectedServer, RabbitMessage> send) {
+		sendLambda = send;
+	}
 
 	public abstract boolean handleRequest(S connState, ConnectedServer sendingServer, JSONObject data);
 
@@ -18,7 +26,7 @@ public abstract class InteractiveRabbitCommand<S extends PacketSession> extends 
 	}
 
 	protected void sendReply(ConnectedServer target, RabbitMessage message) {
-		ZeusRabbitGateway.getInstance().sendMessage(target, message.getJSON());
+		sendLambda.accept(target, message);
 	}
 
 	protected void broadcastReply(RabbitMessage message) {

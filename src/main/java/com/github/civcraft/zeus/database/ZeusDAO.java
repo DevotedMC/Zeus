@@ -1,21 +1,16 @@
 package com.github.civcraft.zeus.database;
 
 import java.io.ByteArrayInputStream;
-import java.sql.Blob;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 
-import com.github.civcraft.zeus.model.PlayerNBT;
 import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.servers.ConnectedServer;
-import com.github.civcraft.zeus.util.Base64Encoder;
 
 public class ZeusDAO {
 	
@@ -78,8 +73,8 @@ public class ZeusDAO {
 					+ "  return E'\\\\000'::bytea;" //target server will generate initial data
 					+ "else "
 					+ "  if existing_data.active_server != null then"
-					+ "    perform pg_advisory_unlock(in_lock);" //always release lock
-					+ "    return  E'\\\\001'::bytea;"
+					+ "    perform pg_advisory_unlock(in_lock);"
+					+ "    return  E'\\\\001'::bytea;" //signals error
 					+ "  else"
 					+ "    update players set active_server = in_server where player = in_player;"
 					+ "    perform pg_advisory_unlock(in_lock);"

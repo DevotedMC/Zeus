@@ -2,17 +2,18 @@ package com.github.civcraft.zeus.plugin;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
+
+import com.github.civcraft.zeus.plugin.internal.ZeusPluginService;
 
 public class ZeusPluginManager {
 
@@ -31,21 +32,59 @@ public class ZeusPluginManager {
 		reloadPlugins();
 	}
 
-	/**
-	 * Starts a plugin and returns the plugin started
-	 *
-	 * @param pluginName Name of the plugin to start
-	 * @param args       Arguments to pass to the plugin on startup
-	 * @return Created plugin instance
-	 */
-	public ZeusPlugin startPlugin(String pluginName) {
-		ZeusPlugin plugin = getPlugin(pluginName);
-		if (plugin == null) {
-			logger.warn(String.format("Plugin %s did not exist", pluginName));
-			return null;
+	public void enableAllPlugins() {
+		Map<String, ZeusPlugin> todoPlugins = new HashMap<>(plugins);
+		Map<String, ZeusPlugin> finishedPlugins = new HashMap<>(plugins);
+		List<ZeusPlugin> enableOrder = new ArrayList<>();
+		while (!todoPlugins.isEmpty()) {
+			Iterator<Entry<String, ZeusPlugin>> iter = todoPlugins.entrySet().iterator();
+			boolean found = false;
+			while (iter.hasNext()) {
+				ZeusPlugin currentPlugin = iter.next().getValue();
+				boolean hasUnhandledDependency = false;
+				for (String dependency : currentPlugin.getDependencies()) {
+					if (todoPlugins.containsKey(dependency)) {
+						hasUnhandledDependency = true;
+						break;
+					}
+					if (!finishedPlugins.containsKey(dependency)) {
+						logger.error("Can not enable plugin " + currentPlugin.getName() + ", because its dependency "
+								+ dependency + " was not available");
+						iter.remove();
+						hasUnhandledDependency = true;
+					}
+				}
+				if (hasUnhandledDependency) {
+					continue;
+				}
+				// all dependencies available
+				iter.remove();
+				finishedPlugins.put(currentPlugin.getName(), currentPlugin);
+				enableOrder.add(currentPlugin);
+				found = true;
+				break;
+			}
+			if (!found) {
+				logger.error(
+						"Cyclic dependency in plugins detected, unresolved plugin set which will not be enabled is: "
+								+ todoPlugins);
+				break;
+			}
 		}
+		for(ZeusPlugin plugin: enableOrder) {
+			startPlugin(plugin);
+		}
+	}
+
+	/**
+	 * Starts a plugin
+	 *
+	 * @param pluginName Plugin to start
+	 */
+	public void startPlugin(ZeusPlugin plugin) {
+		logger.info("Enabling plugin " + plugin.getName() + ":" + plugin.getVersion());
 		plugin.enable(logger, new File(mainServerFolder, ZeusPluginService.PLUGIN_FOLDER));
-		return plugin;
+		activePlugins.add(plugin);
 	}
 
 	/**
@@ -60,16 +99,14 @@ public class ZeusPluginManager {
 
 	private void registerPlugin(ZeusPlugin plugin) {
 		Class<? extends ZeusPlugin> pluginClass = plugin.getClass();
-		ZeusPlugin pluginAnnotation = pluginClass.getAnnotation(ZeusLoad.class);
+		ZeusLoad pluginAnnotation = pluginClass.getAnnotation(ZeusLoad.class);
 		if (pluginAnnotation == null) {
-			logger
-					.warn("Plugin " + plugin.getClass().getName() + " had no AngeliaLoad annotation, it was ignored");
+			logger.warn("Plugin " + plugin.getClass().getName() + " had no AngeliaLoad annotation, it was ignored");
 			return;
 		}
 		Constructor<?> constr = pluginClass.getConstructors()[0];
 		if (constr.getParameterCount() != 0) {
-			logger
-					.warn("Plugin " + plugin.getClass().getName() + " had no default constructor, it was ignored");
+			logger.warn("Plugin " + plugin.getClass().getName() + " had no default constructor, it was ignored");
 			return;
 		}
 		constr.setAccessible(true);
@@ -94,38 +131,19 @@ public class ZeusPluginManager {
 	 * Stops all plugins
 	 */
 	public void shutDown() {
-		while (!runningPlugins.isEmpty()) {
-			stopPlugin(runningPlugins.get(0));
+		while (!activePlugins.isEmpty()) {
+			stopPlugin(activePlugins.iterator().next());
 		}
 	}
 
-	/**
-	 * Finishes the plugin with the given name
-	 *
-	 * @param name Name of the plugin to stop
-	 * @return Whether a plugin was stopped
-	 */
-	public boolean stopPlugin(String name) {
-		name = name.toLowerCase();
-		Iterator<AngeliaPlugin> iterator = runningPlugins.iterator();
-		while (iterator.hasNext()) {
-			AngeliaPlugin plugin = iterator.next();
-			if (plugin.getName().toLowerCase().equals(name)) {
-				stopPlugin(plugin);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void stopPlugin(AngeliaPlugin plugin) {
-		connection.getLogger().info("Stopping plugin " + plugin.getName());
+	private void stopPlugin(ZeusPlugin plugin) {
+		logger.info("Disabling plugin " + plugin.getName() + ":" + plugin.getVersion());
 		try {
-			plugin.stop();
+			plugin.disable();
 		} catch (Exception e) {
-			connection.getLogger().warn("Failed to stop plugin", e);
+			logger.warn("Failed to stop plugin", e);
 		}
-		runningPlugins.remove(plugin);
+		activePlugins.remove(plugin);
 	}
 
 }

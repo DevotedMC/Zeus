@@ -7,7 +7,6 @@ import org.json.JSONObject;
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.rabbit.PacketSession;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
-import com.github.civcraft.zeus.rabbit.ZeusRabbitGateway;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public abstract class InteractiveRabbitCommand<S extends PacketSession> extends RabbitRequest {

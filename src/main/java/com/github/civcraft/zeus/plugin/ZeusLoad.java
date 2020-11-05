@@ -15,4 +15,9 @@ public @interface ZeusLoad {
 
 	String version();
 
+	/**
+	 * @return Space separated list of plugin names to be enabled before this one
+	 */
+	String dependencies() default "";
+
 }

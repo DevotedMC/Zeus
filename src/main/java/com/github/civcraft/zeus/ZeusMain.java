@@ -1,6 +1,7 @@
 package com.github.civcraft.zeus;
 
 import java.io.Console;
+import java.io.File;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,11 +13,13 @@ import com.github.civcraft.zeus.database.ZeusDAO;
 import com.github.civcraft.zeus.model.GlobalPlayerData;
 import com.github.civcraft.zeus.model.PlayerManager;
 import com.github.civcraft.zeus.model.TransactionIdManager;
+import com.github.civcraft.zeus.plugin.ZeusPluginManager;
+import com.github.civcraft.zeus.plugin.event.EventBroadcaster;
 import com.github.civcraft.zeus.rabbit.BroadcastInterestTracker;
 import com.github.civcraft.zeus.rabbit.ZeusRabbitGateway;
 import com.github.civcraft.zeus.rabbit.outgoing.ResetConnectionPacket;
 
-public class ZeusMain {
+public final class ZeusMain {
 
 	private static ZeusMain instance;
 
@@ -38,6 +41,8 @@ public class ZeusMain {
 	private ZeusRabbitGateway rabbitGateway;
 	private ZeusConfigManager configManager;
 	private ZeusDAO dao;
+	private ZeusPluginManager pluginManager;
+	private EventBroadcaster eventManager;
 	private boolean isRunning = true;
 
 	private ZeusMain() {
@@ -54,6 +59,8 @@ public class ZeusMain {
 			logger.error("Failed to init DB, shutting down");
 			System.exit(0);
 		}
+		this.eventManager = new EventBroadcaster(logger);
+		this.pluginManager = new ZeusPluginManager(logger, new File("."));
 		this.broadcastInterestTracker = new BroadcastInterestTracker();
 		this.serverManager = new ServerManager(configManager.parseClientServers());
 		this.serverPlacementManager = new ServerPlacementManager();
@@ -64,6 +71,7 @@ public class ZeusMain {
 			System.exit(0);
 		}
 		this.commandHandler = new ZeusCommandHandler(logger);
+		this.pluginManager.enableAllPlugins();
 		parseInput();
 	}
 
@@ -123,6 +131,14 @@ public class ZeusMain {
 	
 	public ZeusDAO getDAO() {
 		return dao;
+	}
+	
+	public ZeusPluginManager getPluginManager() {
+		return pluginManager;
+	}
+	
+	public EventBroadcaster getEventManager() {
+		return eventManager;
 	}
 
 	public ServerPlacementManager getServerPlacementManager() {

@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.plugin;
+package com.github.civcraft.zeus.plugin.internal;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -23,9 +23,12 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ExecutableType;
 import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import javax.tools.Diagnostic.Kind;
+
+import com.github.civcraft.zeus.plugin.ZeusLoad;
+import com.github.civcraft.zeus.plugin.ZeusPlugin;
 
 @SupportedSourceVersion(value = SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("com.github.civcraft.zeus.plugin.ZeusLoad")

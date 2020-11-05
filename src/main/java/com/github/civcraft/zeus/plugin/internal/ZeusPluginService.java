@@ -1,4 +1,4 @@
-package com.github.civcraft.zeus.plugin;
+package com.github.civcraft.zeus.plugin.internal;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -6,12 +6,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.Logger;
+
+import com.github.civcraft.zeus.plugin.ZeusPlugin;
 
 public class ZeusPluginService {
 
@@ -22,7 +23,7 @@ public class ZeusPluginService {
 
 	private Logger logger;
 
-	ZeusPluginService(Logger logger) {
+	public ZeusPluginService(Logger logger) {
 		this.logger = logger;
 		classLoader = addPluginFolderToClassPath();
 		reloadJars();

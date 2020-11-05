@@ -23,7 +23,7 @@ public class ZeusCommandHandler {
 		registerCommand(new ShutdownCommand());
 	}
 	
-	private void registerCommand(ZeusCommand command) {
+	public void registerCommand(ZeusCommand command) {
 		commands.put(command.getIdentifier().toLowerCase(), command);
 		for(String alt : command.getAlternativeIdentifiers()) {
 			commands.putIfAbsent(alt.toLowerCase(), command);

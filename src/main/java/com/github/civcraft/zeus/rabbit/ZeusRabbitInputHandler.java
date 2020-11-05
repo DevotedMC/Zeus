@@ -12,7 +12,6 @@ import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerInitTransferReques
 import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerLocationRequest;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.ReceivePlayerData;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.SendPlayerReply;
-import com.github.civcraft.zeus.rabbit.incoming.general.AddBroadcastInterest;
 
 public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 	

@@ -6,10 +6,8 @@ import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.model.ZeusLocation;
-import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.incoming.StaticRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerData;
-import com.github.civcraft.zeus.rabbit.sessions.PlayerDataTransferSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 import com.github.civcraft.zeus.util.Base64Encoder;
 

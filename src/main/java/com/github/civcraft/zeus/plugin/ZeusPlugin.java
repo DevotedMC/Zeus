@@ -1,8 +1,14 @@
 package com.github.civcraft.zeus.plugin;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+
+import com.github.civcraft.zeus.ZeusMain;
+import com.github.civcraft.zeus.plugin.event.ZeusListener;
 
 public abstract class ZeusPlugin {
 	
@@ -44,6 +50,13 @@ public abstract class ZeusPlugin {
 	protected ZeusPluginConfig getConfig() {
 		return config;
 	}
+	
+	protected void registerPluginlistener(ZeusListener listener, ZeusListener ... listeners) {
+		ZeusMain.getInstance().getEventManager().registerListener(listener);
+		for(ZeusListener lis : listeners) {
+			ZeusMain.getInstance().getEventManager().registerListener(lis);
+		}
+	}
 
 	/**
 	 * @return Folder in which this plugins data (like its YAML config) is kept
@@ -61,6 +74,18 @@ public abstract class ZeusPlugin {
 			return null;
 		}
 		return pluginAnnotation.description();
+	}
+	
+	public List<String> getDependencies() {
+		ZeusLoad pluginAnnotation = getPluginAnnotation();
+		if (pluginAnnotation == null) {
+			return Collections.emptyList();
+		}
+		String unsplit = pluginAnnotation.dependencies();
+		if (unsplit == null || unsplit.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return Arrays.asList(unsplit.split(" "));
 	}
 
 	/**
@@ -88,6 +113,17 @@ public abstract class ZeusPlugin {
 			return null;
 		}
 		return pluginAnnotation.version();
+	}
+	
+	public int hashCode() {
+		return getName().hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if (!(o instanceof ZeusPlugin)) {
+			return false;
+		}
+		return ((ZeusPlugin) o).getName().equals(this.getName());
 	}
 
 }

@@ -13,11 +13,18 @@ import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerLocation;
 import com.github.civcraft.zeus.rabbit.sessions.LocationRequestSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
+/**
+ * Any ConnectedServer can request the saved location of any known player and
+ * whether they're online right now through the packet handled here
+ *
+ */
 public class PlayerLocationRequest extends InteractiveRabbitCommand<LocationRequestSession> {
+	
+	public static final String ID = "player_loc_request";
 
 	@Override
 	public String getIdentifier() {
-		return "player_location_reply";
+		return ID;
 	}
 
 	@Override

@@ -13,6 +13,9 @@ import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
 
+import com.github.civcraft.zeus.ZeusMain;
+import com.github.civcraft.zeus.plugin.event.events.PluginDisableEvent;
+import com.github.civcraft.zeus.plugin.event.events.PluginEnableEvent;
 import com.github.civcraft.zeus.plugin.internal.ZeusPluginService;
 
 public class ZeusPluginManager {
@@ -83,6 +86,7 @@ public class ZeusPluginManager {
 	 */
 	public void startPlugin(ZeusPlugin plugin) {
 		logger.info("Enabling plugin " + plugin.getName() + ":" + plugin.getVersion());
+		ZeusMain.getInstance().getEventManager().broadcast(new PluginEnableEvent(plugin));
 		plugin.enable(logger, new File(mainServerFolder, ZeusPluginService.PLUGIN_FOLDER));
 		activePlugins.add(plugin);
 	}
@@ -139,6 +143,7 @@ public class ZeusPluginManager {
 	private void stopPlugin(ZeusPlugin plugin) {
 		logger.info("Disabling plugin " + plugin.getName() + ":" + plugin.getVersion());
 		try {
+			ZeusMain.getInstance().getEventManager().broadcast(new PluginDisableEvent(plugin));
 			plugin.disable();
 		} catch (Exception e) {
 			logger.warn("Failed to stop plugin", e);

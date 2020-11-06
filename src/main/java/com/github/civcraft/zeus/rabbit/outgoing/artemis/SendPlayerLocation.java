@@ -7,6 +7,8 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.google.common.base.Preconditions;
 
 public class SendPlayerLocation extends RabbitMessage {
+	
+	public static final String ID = "reply_location_request";
 
 	private ZeusLocation location;
 	
@@ -23,7 +25,7 @@ public class SendPlayerLocation extends RabbitMessage {
 
 	@Override
 	public String getIdentifier() {
-		return "reply_location_request";
+		return ID;
 	}
 
 }

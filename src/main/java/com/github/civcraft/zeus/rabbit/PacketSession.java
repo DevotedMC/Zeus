@@ -1,5 +1,7 @@
 package com.github.civcraft.zeus.rabbit;
 
+import java.util.function.LongConsumer;
+
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 /**
@@ -12,6 +14,7 @@ public abstract class PacketSession {
 	private final String transactionID;
 	private final long creationTime;
 	private long lastUpdate;
+	private LongConsumer expirationHandler;
 	
 	public PacketSession(ConnectedServer source, String transactionID) {
 		this.source = source;
@@ -20,8 +23,17 @@ public abstract class PacketSession {
 		this.lastUpdate = creationTime;
 	}
 	
-	public void refreshUpdateTimer() {
-		this.lastUpdate = System.currentTimeMillis();
+	public synchronized void refreshUpdateTimer() {
+		long newUpdate = System.currentTimeMillis();
+		expirationHandler.accept(newUpdate);
+	}
+	
+	/**
+	 * Don't use this from anywhere but the transaction id manager
+	 * @param time Updated timestamp
+	 */
+	public void updateInternalExpirationTimer(long time) {
+		this.lastUpdate = time;
 	}
 	
 	public boolean hasExpired() {
@@ -30,6 +42,10 @@ public abstract class PacketSession {
 	
 	protected long getExpirationTime() {
 		return 10_000L;
+	}
+	
+	public long getExpirationTimestamp() {
+		return lastUpdate + getExpirationTime();
 	}
 	
 	public String getTransactionID() {
@@ -42,6 +58,10 @@ public abstract class PacketSession {
 	
 	public ConnectedServer getServerID() {
 		return this.source;
+	}
+	
+	public void setExpirationUpdate(LongConsumer expirationHandler) {
+		this.expirationHandler = expirationHandler;
 	}
 	
 	public abstract void handleTimeout();

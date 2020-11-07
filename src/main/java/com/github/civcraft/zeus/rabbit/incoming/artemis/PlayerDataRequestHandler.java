@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.database.ZeusDAO;
+import com.github.civcraft.zeus.model.GlobalPlayerData;
 import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerDataRequest;
@@ -14,6 +15,8 @@ import com.github.civcraft.zeus.rabbit.sessions.PlayerDataTransferSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDataTransferSession> {
+	
+	public static final String ID = "get_player_data";
 
 	@Override
 	public boolean handleRequest(PlayerDataTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
@@ -23,7 +26,16 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDat
 			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
 			return false;
 		}
-		ZeusLocation location = dao.getLocation(connState.getPlayer());
+		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager().getLoggedInPlayerByUUID(connState.getPlayer());
+		if (zeusPlayerData == null) { //player is offline?
+			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+			return false;
+		}
+		
+		ZeusLocation location = zeusPlayerData.consumeIntendedNextLocation();
+		if (location == null) {
+			location = dao.getLocation(connState.getPlayer());
+		}
 		sendReply(sendingServer,
 				new SendPlayerData(connState.getTransactionID(), connState.getPlayer(), playerData, location));
 		// we expect explicit confirmation of the target server regarding them actually
@@ -38,7 +50,7 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDat
 
 	@Override
 	public String getIdentifier() {
-		return "get_player_data";
+		return ID;
 	}
 
 	@Override

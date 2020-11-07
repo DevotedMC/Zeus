@@ -7,12 +7,14 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
+import com.github.civcraft.zeus.model.GlobalPlayerData;
 import com.github.civcraft.zeus.model.ZeusLocation;
 import com.github.civcraft.zeus.plugin.event.events.PlayerInitialLoginEvent;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.ConfirmInitialPlayerLogin;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerInitialLogin;
 import com.github.civcraft.zeus.rabbit.sessions.ZeusPlayerLoginSession;
+import com.github.civcraft.zeus.servers.ApolloServer;
 import com.github.civcraft.zeus.servers.ArtemisServer;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
@@ -25,18 +27,16 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 		ZeusLocation location = ZeusMain.getInstance().getDAO().getLocation(connState.getPlayer());
 		ArtemisServer target = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(location);
 		PlayerInitialLoginEvent loginEvent = new PlayerInitialLoginEvent(connState.getPlayer(), connState.getIP(),
-				target, location);
+				target, location, connState.getName());
 		ZeusMain.getInstance().getEventManager().broadcast(loginEvent);
 		if (loginEvent.isCancelled()) {
 			String msg;
 			if (loginEvent.getDenyMessage() != null) {
 				msg = loginEvent.getDenyMessage();
-			}
-			else {
+			} else {
 				msg = "Login denied";
 			}
-			sendReply(connState.getServerID(),
-					new RejectPlayerInitialLogin(connState.getTransactionID(), msg));
+			sendReply(connState.getServerID(), new RejectPlayerInitialLogin(connState.getTransactionID(), msg));
 			return false;
 		}
 		if (target == null) {
@@ -44,7 +44,16 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 					new RejectPlayerInitialLogin(connState.getTransactionID(), "No target found"));
 			return false;
 		}
-		sendReply(connState.getServerID(), new ConfirmInitialPlayerLogin(connState.getTransactionID(), target.getID()));
+		if (!target.hasActiveConnection()) {
+			sendReply(connState.getServerID(),
+					new RejectPlayerInitialLogin(connState.getTransactionID(), "Target server is offline"));
+			return false;
+		}
+		String name = loginEvent.getPlayerName();
+		ZeusMain.getInstance().getPlayerManager()
+				.addPlayer(new GlobalPlayerData(connState.getPlayer(), name, (ApolloServer) sendingServer));
+		sendReply(connState.getServerID(),
+				new ConfirmInitialPlayerLogin(connState.getTransactionID(), target.getID(), name));
 		return false;
 	}
 
@@ -61,6 +70,7 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 	@Override
 	protected ZeusPlayerLoginSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
+		String name = data.getString("name");
 		InetAddress ip;
 		try {
 			ip = InetAddress.getByName(data.getString("ip"));
@@ -68,7 +78,7 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 			ZeusMain.getInstance().getLogger().error("Could not parse ip", e);
 			ip = null;
 		}
-		return new ZeusPlayerLoginSession(source, transactionID, player, ip);
+		return new ZeusPlayerLoginSession(source, transactionID, player, ip, name);
 	}
 
 }

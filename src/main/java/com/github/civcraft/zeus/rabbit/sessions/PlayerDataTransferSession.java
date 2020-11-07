@@ -9,9 +9,19 @@ import com.github.civcraft.zeus.servers.ConnectedServer;
 public class PlayerDataTransferSession extends PlayerSpecificPacketSession {
 	private byte [] data;
 	private ZeusLocation location;
+	private int requestAttempt;
 
 	public PlayerDataTransferSession(ConnectedServer source, String transactionID, UUID player) {
 		super(source, transactionID, player);
+		this.requestAttempt = 0;
+	}
+	
+	public int getRequestAttempts() {
+		return requestAttempt;
+	}
+	
+	public void incrementRequestAttempts() {
+		requestAttempt++;
 	}
 	
 	public void setData(byte [] data, ZeusLocation location) {

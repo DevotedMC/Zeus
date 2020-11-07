@@ -32,7 +32,7 @@ public class ZeusDAO {
 			try (PreparedStatement prep = conn.prepareStatement("CREATE OR REPLACE FUNCTION insert_player_data "
 					+ "(in_lock bigint, in_player uuid, in_data bytea, in_server varchar(255), in_world varchar(255),"
 					+ "in_loc_x double precision, in_loc_y double precision, in_loc_z double precision) "
-					+ "returns void "
+					+ "returns int "
 					+ "language plpgsql as $$ "
 					+ "declare"
 					+ "  existing_data players%rowtype;"
@@ -41,17 +41,18 @@ public class ZeusDAO {
 					+ "select * from players into existing_data ;"
 					+ "if not found then"
 					+ "  perform pg_advisory_unlock(in_lock);"
-					+ "  RAISE EXCEPTION 'No prepared entry for %', in_player; "
+					+ "  return 1;" //no prepared entry available to write data to
 					+ "else"
 					+ "  if existing_data.active_server != in_server then"
 					+ "    perform pg_advisory_unlock(in_lock);"
-					+ "    RAISE EXCEPTION 'Bad data source for %', in_player;"
+					+ "    return 2;" //existing data lock from other server
 					+ "  else"
 					+ "    update players set data = in_data, active_server = null, world = in_world, "
 					+ "      loc_x = in_loc_x, loc_y = in_loc_y, loc_z = in_loc_z where player = in_player;"
 					+ "  end if; "
 					+ "end if; "
 					+ "perform pg_advisory_unlock(in_lock); "
+					+ "return 3;" //success
 					+ "end;"
 					+ "$$")) {
 				prep.execute();
@@ -72,7 +73,7 @@ public class ZeusDAO {
 					+ "  perform pg_advisory_unlock(in_lock);"
 					+ "  return E'\\\\000'::bytea;" //target server will generate initial data
 					+ "else "
-					+ "  if existing_data.active_server != null then"
+					+ "  if existing_data.active_server is not null then"
 					+ "    perform pg_advisory_unlock(in_lock);"
 					+ "    return  E'\\\\001'::bytea;" //signals error
 					+ "  else"
@@ -157,8 +158,22 @@ public class ZeusDAO {
 			prep.setDouble(6, location.getX());
 			prep.setDouble(7, location.getY());
 			prep.setDouble(8, location.getZ());
-			prep.execute();
-			return true;
+			try(ResultSet rs = prep.executeQuery()) {
+				rs.next();
+				int status = rs.getInt(1);
+				switch (status) {
+				case 1:
+				logger.error(String.format("Failed to save data for %s, no prepared entry in the db could be found", player));
+				return false;
+				case 2:
+					logger.error(String.format("Failed to insert data for %s, another server is holding the player data lock", player));
+				return false;
+				case 3:
+					return true;
+					default:
+						throw new IllegalStateException("Illegal return code when saving player data");
+				}
+			}
 		} catch (SQLException e) {
 			logger.error("Failed to save player NBT", e);
 			return false;

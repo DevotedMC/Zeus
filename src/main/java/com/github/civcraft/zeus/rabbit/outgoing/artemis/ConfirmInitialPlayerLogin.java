@@ -9,14 +9,17 @@ public class ConfirmInitialPlayerLogin extends RabbitMessage {
 	public static final String ID = "accept_player_initial_login";
 	
 	private String targetServer;
+	private String playerName;
 
-	public ConfirmInitialPlayerLogin(String transactionID, String targetServer) {
+	public ConfirmInitialPlayerLogin(String transactionID, String targetServer, String playerName) {
 		super(transactionID);
 		this.targetServer = targetServer;
+		this.playerName = playerName;
 	}
 
 	@Override
 	protected void enrichJson(JSONObject json) {
+		json.put("name", playerName);
 		json.put("target", targetServer);
 	}
 

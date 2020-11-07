@@ -7,6 +7,6 @@ package com.github.civcraft.zeus.model;
  */
 public enum TransferRejectionReason {
 
-	INVALID_SOURCE, TARGET_REJECT, TARGET_DOWN, NO_TARGET_FOUND;
+	INVALID_SOURCE, TARGET_REJECT, TARGET_DOWN, NO_TARGET_FOUND, PLAYER_LOGOFF;
 
 }

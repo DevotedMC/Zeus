@@ -13,6 +13,8 @@ import com.google.common.base.Preconditions;
  *
  */
 public class SendPlayerRequest extends RabbitMessage {
+	
+	public static final String ID = "receive_player_request";
 
 	private UUID player;
 	private ZeusLocation location;
@@ -33,7 +35,7 @@ public class SendPlayerRequest extends RabbitMessage {
 
 	@Override
 	public String getIdentifier() {
-		return "receive_player_request";
+		return ID;
 	}
 
 }

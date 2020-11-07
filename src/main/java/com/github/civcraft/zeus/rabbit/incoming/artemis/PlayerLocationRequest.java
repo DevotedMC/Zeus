@@ -30,7 +30,7 @@ public class PlayerLocationRequest extends InteractiveRabbitCommand<LocationRequ
 	@Override
 	public boolean handleRequest(LocationRequestSession connState, ConnectedServer sendingServer, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
-		GlobalPlayerData playerData = ZeusMain.getInstance().getPlayerDataManager().getLoggedInPlayerByUUID(player);
+		GlobalPlayerData playerData = ZeusMain.getInstance().getPlayerManager().getLoggedInPlayerByUUID(player);
 		data.put("online", playerData != null);
 		ZeusLocation loc = ZeusMain.getInstance().getDAO().getLocation(player);
 		if (loc == null) {

@@ -8,6 +8,8 @@ import com.google.common.base.Preconditions;
 
 public class RejectPlayerTransfer extends RabbitMessage {
 	
+	public static final String ID = "reject_transfer";
+	
 	private TransferRejectionReason reason;
 
 	public RejectPlayerTransfer(String transactionID, TransferRejectionReason reason) {
@@ -23,7 +25,7 @@ public class RejectPlayerTransfer extends RabbitMessage {
 
 	@Override
 	public String getIdentifier() {
-		return "reject_transfer";
+		return ID;
 	}
 
 }

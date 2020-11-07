@@ -9,7 +9,6 @@ import com.github.civcraft.zeus.servers.ArtemisServer;
 
 /**
  * Called when a player is first connecting to a Bungee server from outside
- *
  */
 public class PlayerInitialLoginEvent extends CancellableEvent {
 
@@ -18,12 +17,31 @@ public class PlayerInitialLoginEvent extends CancellableEvent {
 	private String denyMessage;
 	private ZeusLocation location;
 	private ArtemisServer intendedTargetServer;
+	private String playerName;
 
-	public PlayerInitialLoginEvent(UUID player, InetAddress ip, ArtemisServer server, ZeusLocation location) {
+	public PlayerInitialLoginEvent(UUID player, InetAddress ip, ArtemisServer server, ZeusLocation location,
+			String playerName) {
 		this.player = player;
 		this.ip = ip;
 		this.intendedTargetServer = server;
 		this.location = location;
+		this.playerName = playerName;
+	}
+
+	/**
+	 * @return Name the player will have
+	 */
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	/**
+	 * Sets the name the player will have
+	 * 
+	 * @param playerName
+	 */
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 
 	/**
@@ -41,10 +59,11 @@ public class PlayerInitialLoginEvent extends CancellableEvent {
 	public ArtemisServer getTargetServer() {
 		return intendedTargetServer;
 	}
-	
+
 	/**
 	 * Sets the location the player will be sent to
-	 * @param target Server to send the player to
+	 * 
+	 * @param target   Server to send the player to
 	 * @param location Location to send the player to
 	 */
 	public void setTarget(ArtemisServer target, ZeusLocation location) {

@@ -110,6 +110,10 @@ public class ZeusRabbitGateway {
 	public boolean sendMessage(ConnectedServer server, JSONObject json) {
 		return sendMessage(server, json.toString());
 	}
+	
+	public boolean sendMessage(ConnectedServer server, RabbitMessage msg) {
+		return sendMessage(server, msg.getJSON());
+	}
 
 	public void broadcastMessage(Collection<ConnectedServer> servers, JSONObject json) {
 		for (ConnectedServer server : servers) {

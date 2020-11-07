@@ -66,6 +66,7 @@ public abstract class AbstractRabbitInputHandler {
 				logError("Failed to create new session for " + type);
 				return;
 			}
+			transactionManager.putSession(session);
 		}
 		else {
 			session = transactionManager.getSession(transactionID);

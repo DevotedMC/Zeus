@@ -10,36 +10,35 @@ import org.apache.logging.log4j.Logger;
 import com.github.civcraft.zeus.commands.sender.CommandSender;
 
 public abstract class ZeusCommand {
-	
+
 	private static final Pattern validCommands = Pattern.compile("[a-zA-Z0-9]+");
-	
+
 	private String id;
 	private List<String> altIdentifiers;
 	private int minArgs;
 	private int maxArgs;
-	
-	
+
 	boolean setupInternals(Logger logger) {
 		ZCommand annot = getPluginAnnotation();
 		if (!validCommands.matcher(annot.id()).matches()) {
-			logger.warn("Main command identifier " + annot.id() + " is not valid");
+			logger.warn(String.format("Main command identifier %s is not valid", annot.id()));
 			return false;
 		}
 		id = annot.id();
 		if (annot.altIds() != null && !annot.altIds().isEmpty()) {
 			altIdentifiers = Arrays.asList(annot.altIds().split(" "));
-			for(String altId : altIdentifiers) {
-				logger.warn("Alternative identifier " + altId + " in command " + id + " was not valid");
-				return false;
+			for (String altId : altIdentifiers) {
+				if (!validCommands.matcher(altId).matches()) {
+					logger.warn("Alternative identifier " + altId + " in command " + id + " was not valid");
+					return false;
+				}
 			}
-		}
-		else {
+		} else {
 			altIdentifiers = Collections.emptyList();
 		}
 		if (annot.minArgs() != ZCommand.DEFAULT_ARG_NUM) {
 			minArgs = annot.minArgs();
-		}
-		else {
+		} else {
 			minArgs = annot.args();
 		}
 		if (minArgs < 0) {
@@ -48,8 +47,7 @@ public abstract class ZeusCommand {
 		}
 		if (annot.maxArgs() != ZCommand.DEFAULT_ARG_NUM) {
 			maxArgs = annot.maxArgs();
-		}
-		else {
+		} else {
 			maxArgs = annot.args();
 		}
 		if (maxArgs < minArgs) {
@@ -58,7 +56,7 @@ public abstract class ZeusCommand {
 		}
 		return true;
 	}
-	
+
 	private ZCommand getPluginAnnotation() {
 		Class<? extends ZeusCommand> pluginClass = this.getClass();
 		return pluginClass.getAnnotation(ZCommand.class);
@@ -77,21 +75,21 @@ public abstract class ZeusCommand {
 	String getIdentifier() {
 		return id;
 	}
-	
+
 	/**
 	 * @return Minimum amount of arguments required by this command
 	 */
 	int getMinArgs() {
 		return minArgs;
 	}
-	
+
 	/**
 	 * @return Maximum amount of arguments accepted by this command
 	 */
 	int getMaxArgs() {
 		return maxArgs;
 	}
-	
+
 	public abstract String handle(CommandSender sender, String command);
 
 }

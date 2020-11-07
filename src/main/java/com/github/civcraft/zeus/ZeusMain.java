@@ -3,6 +3,9 @@ package com.github.civcraft.zeus;
 import java.io.Console;
 import java.io.File;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,8 +13,6 @@ import org.apache.logging.log4j.Logger;
 import com.github.civcraft.zeus.commands.ZeusCommandHandler;
 import com.github.civcraft.zeus.commands.sender.ConsoleSender;
 import com.github.civcraft.zeus.database.ZeusDAO;
-import com.github.civcraft.zeus.model.GlobalPlayerData;
-import com.github.civcraft.zeus.model.PlayerManager;
 import com.github.civcraft.zeus.model.TransactionIdManager;
 import com.github.civcraft.zeus.plugin.ZeusPluginManager;
 import com.github.civcraft.zeus.plugin.event.EventBroadcaster;
@@ -34,15 +35,16 @@ public final class ZeusMain {
 	private Logger logger;
 	private BroadcastInterestTracker broadcastInterestTracker;
 	private ServerManager serverManager;
+	private ZeusPlayerManager playerManager;
 	private ServerPlacementManager serverPlacementManager;
 	private TransactionIdManager transactionIdManager;
-	private PlayerManager<GlobalPlayerData> playerDataManager;
 	private ZeusCommandHandler commandHandler;
 	private ZeusRabbitGateway rabbitGateway;
 	private ZeusConfigManager configManager;
 	private ZeusDAO dao;
 	private ZeusPluginManager pluginManager;
 	private EventBroadcaster eventManager;
+	 private ScheduledExecutorService transactionCleanupThread;
 	private boolean isRunning = true;
 
 	private ZeusMain() {
@@ -59,19 +61,21 @@ public final class ZeusMain {
 			logger.error("Failed to init DB, shutting down");
 			System.exit(0);
 		}
+		this.playerManager = new ZeusPlayerManager();
 		this.eventManager = new EventBroadcaster(logger);
 		this.pluginManager = new ZeusPluginManager(logger, new File("."));
 		this.broadcastInterestTracker = new BroadcastInterestTracker();
 		this.serverManager = new ServerManager(configManager.parseClientServers());
 		this.serverPlacementManager = new ServerPlacementManager();
-		this.transactionIdManager = new TransactionIdManager("zeus");
-		this.playerDataManager = new PlayerManager<>();
+		this.transactionIdManager = new TransactionIdManager("zeus", logger::info);
 		if (!startRabbit()) {
 			logger.error("Failed to start rabbit, exiting");
 			System.exit(0);
 		}
 		this.commandHandler = new ZeusCommandHandler(logger);
 		this.pluginManager.enableAllPlugins();
+		transactionCleanupThread = Executors.newScheduledThreadPool(1);
+		transactionCleanupThread.scheduleAtFixedRate(transactionIdManager::updateTimeouts, 10, 10, TimeUnit.MILLISECONDS);
 		parseInput();
 	}
 
@@ -133,6 +137,10 @@ public final class ZeusMain {
 		return dao;
 	}
 	
+	public ZeusPlayerManager getPlayerManager() {
+		return playerManager;
+	}
+	
 	public ZeusPluginManager getPluginManager() {
 		return pluginManager;
 	}
@@ -143,10 +151,6 @@ public final class ZeusMain {
 
 	public ServerPlacementManager getServerPlacementManager() {
 		return serverPlacementManager;
-	}
-
-	public PlayerManager<GlobalPlayerData> getPlayerDataManager() {
-		return playerDataManager;
 	}
 	
 	public ZeusConfigManager getConfigManager() {

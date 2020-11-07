@@ -5,8 +5,10 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
+import com.github.civcraft.zeus.model.GlobalPlayerData;
 import com.github.civcraft.zeus.model.TransferRejectionReason;
 import com.github.civcraft.zeus.model.ZeusLocation;
+import com.github.civcraft.zeus.plugin.event.events.RequestPlayerTransferEvent;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.civcraft.zeus.rabbit.outgoing.artemis.SendPlayerRequest;
@@ -28,30 +30,35 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 
 	protected PlayerTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
-		return new PlayerTransferSession(source, transactionID, player);
+		ZeusLocation loc = ZeusLocation.parseLocation(data.getJSONObject("loc"));
+		return new PlayerTransferSession(source, transactionID, player, loc);
 	}
 
 	@Override
 	public boolean handleRequest(PlayerTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
 		if (!(sendingServer instanceof ArtemisServer)) {
-			sendReply(sendingServer, new RejectPlayerTransfer(connState.getTransactionID(),
-					TransferRejectionReason.INVALID_SOURCE));
+			sendReply(sendingServer,
+					new RejectPlayerTransfer(connState.getTransactionID(), TransferRejectionReason.INVALID_SOURCE));
 			getLogger().error("Only Artemis server can send players, but " + sendingServer + " tried anyway");
 			return false;
 		}
 		ArtemisServer sourceServer = (ArtemisServer) sendingServer;
 		connState.setSourceServer(sourceServer);
-		ZeusLocation loc = ZeusLocation.parseLocation(data.getJSONObject("loc"));
 		ArtemisServer targetServer = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(sourceServer,
-				 loc);
+				connState.getLocation());
+		GlobalPlayerData playerData = ZeusMain.getInstance().getPlayerManager()
+				.getLoggedInPlayerByUUID(connState.getPlayer());
+		ZeusMain.getInstance().getEventManager().broadcast(
+				new RequestPlayerTransferEvent(sourceServer, connState.getLocation(), targetServer, playerData));
 		if (targetServer == null) {
-			sendReply(sendingServer, new RejectPlayerTransfer(connState.getTransactionID(),
-					TransferRejectionReason.NO_TARGET_FOUND));
-			getLogger().error("Failed to find target server for " + loc + " from " + sendingServer);
+			sendReply(sendingServer,
+					new RejectPlayerTransfer(connState.getTransactionID(), TransferRejectionReason.NO_TARGET_FOUND));
+			getLogger().error("Failed to find target server for " + connState.getLocation() + " from " + sendingServer);
 			return false;
 		}
 		connState.setTargetServer(targetServer);
-		sendReply(targetServer, new SendPlayerRequest(connState.getTransactionID(), connState.getPlayer(), loc));
+		sendReply(targetServer,
+				new SendPlayerRequest(connState.getTransactionID(), connState.getPlayer(), connState.getLocation()));
 		return true;
 	}
 

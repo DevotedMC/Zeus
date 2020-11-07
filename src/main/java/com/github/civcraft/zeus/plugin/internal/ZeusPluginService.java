@@ -37,9 +37,9 @@ public class ZeusPluginService {
 			dir.mkdir();
 		}
 		List<File> jars = new ArrayList<>();
-		for (File f : dir.listFiles()) {
-			if (f.getName().endsWith(".jar")) {
-				jars.add(f);
+		for (File file : dir.listFiles()) {
+			if (file.getName().endsWith(".jar")) {
+				jars.add(file);
 			}
 		}
 		List<URL> urlsList = new ArrayList<>();

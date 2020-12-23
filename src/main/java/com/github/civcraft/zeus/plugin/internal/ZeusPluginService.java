@@ -18,7 +18,7 @@ import com.github.civcraft.zeus.plugin.ZeusPlugin;
 public class ZeusPluginService {
 
 	public static final String PLUGIN_FOLDER = "plugins";
-	
+
 	private ServiceLoader<ZeusPlugin> pluginLoader;
 	private ServiceLoader<ZeusCommand> commandLoader;
 	private URLClassLoader classLoader;
@@ -66,7 +66,7 @@ public class ZeusPluginService {
 		}
 		return plugins;
 	}
-	
+
 	public synchronized List<ZeusCommand> getAvailableCommands() {
 		List<ZeusCommand> commands = new ArrayList<>();
 		Iterator<ZeusCommand> iter = commandLoader.iterator();

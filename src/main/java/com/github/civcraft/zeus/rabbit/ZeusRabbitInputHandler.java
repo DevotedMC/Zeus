@@ -13,11 +13,12 @@ import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerInitTransferReques
 import com.github.civcraft.zeus.rabbit.incoming.artemis.PlayerLocationRequest;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.ReceivePlayerData;
 import com.github.civcraft.zeus.rabbit.incoming.artemis.SendPlayerReply;
+import com.github.civcraft.zeus.rabbit.incoming.artemis.ServerWhitelistLevelChange;
 
 public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
-	
+
 	private Logger logger;
-	
+
 	public ZeusRabbitInputHandler(TransactionIdManager transactionIdManager, Logger logger) {
 		super(transactionIdManager);
 		this.logger = logger;
@@ -25,10 +26,10 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 
 	@Override
 	protected void registerCommands() {
-		//apollo
+		// apollo
 		registerCommand(new PlayerLoginRequest());
-		
-		//artemis
+
+		// artemis
 		registerCommand(new AcceptPlayerJoin());
 		registerCommand(new ArtemisStartupHandler());
 		registerCommand(new PlayerDataRequestHandler());
@@ -37,10 +38,12 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 		registerCommand(new PlayerLocationRequest());
 		registerCommand(new ReceivePlayerData());
 		registerCommand(new SendPlayerReply());
-		
-		//registerCommand(new AddBroadcastInterest());
-		//registerCommand(new RemoveBroadcastInterest());
-		
+		registerCommand(new ServerWhitelistLevelChange());
+
+		registerCommand(new StandardRequestHandler());
+		// registerCommand(new AddBroadcastInterest());
+		// registerCommand(new RemoveBroadcastInterest());
+
 	}
 
 	@Override

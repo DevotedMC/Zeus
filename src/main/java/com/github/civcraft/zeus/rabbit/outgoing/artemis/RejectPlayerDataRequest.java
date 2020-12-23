@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
 public class RejectPlayerDataRequest extends RabbitMessage {
-	
+
 	public static final String ID = "reject_player_data_request";
 
 	public RejectPlayerDataRequest(String transactionID) {
@@ -14,13 +14,12 @@ public class RejectPlayerDataRequest extends RabbitMessage {
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		//session id is identifier enough
+		// session id is identifier enough
 	}
 
 	@Override
 	public String getIdentifier() {
 		return ID;
 	}
-	
 
 }

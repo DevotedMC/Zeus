@@ -1,7 +1,7 @@
 package com.github.civcraft.zeus.model.yaml;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -69,7 +69,7 @@ public class ConfigSection {
 		return map;
 	}
 
-	public Map<?, ?> dump() {
+	public Map<String, Object> dump() {
 		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : mapping.entrySet()) {
 			Object objectToPut;
@@ -130,11 +130,23 @@ public class ConfigSection {
 		}
 		return string;
 	}
-	
+
+	public long getLong(String key) {
+		return retrieve(key, Long.class, true);
+	}
+
+	public long getLong(String key, long defaultValue) {
+		Long val = retrieve(key, Long.class, false);
+		if (val == null) {
+			return defaultValue;
+		}
+		return val;
+	}
+
 	public double getDouble(String key) {
 		return retrieve(key, Double.class, true);
 	}
-	
+
 	public double getDouble(String key, double defaultValue) {
 		Double val = retrieve(key, Double.class, false);
 		if (val == null) {
@@ -153,6 +165,10 @@ public class ConfigSection {
 
 	public boolean hasString(String key) {
 		return retrieve(key, String.class, false) != null;
+	}
+
+	public boolean hasLong(String key) {
+		return retrieve(key, Long.class, false) != null;
 	}
 
 	private <T> void internalPut(String tag, T o) {
@@ -245,12 +261,8 @@ public class ConfigSection {
 		return retrieve(splitPath(key), parameterClass, throwException);
 	}
 
-	private List<String> splitPath(String path) {
-		List<String> result = new LinkedList<>();
-		for (String s : path.split("\\.")) {
-			result.add(s);
-		}
-		return result;
+	private static List<String> splitPath(String path) {
+		return Arrays.asList(path.split("\\."));
 	}
 
 	@Override

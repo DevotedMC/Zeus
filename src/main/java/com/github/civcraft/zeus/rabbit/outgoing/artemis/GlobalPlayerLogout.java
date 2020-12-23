@@ -14,7 +14,7 @@ public class GlobalPlayerLogout extends RabbitMessage {
 	@Override
 	protected void enrichJson(JSONObject json) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

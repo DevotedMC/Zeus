@@ -13,9 +13,9 @@ import org.json.JSONObject;
 
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.model.TransactionIdManager;
-import com.github.civcraft.zeus.rabbit.abstr.AbstractRabbitInputHandler;
 import com.github.civcraft.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.civcraft.zeus.servers.ConnectedServer;
+import com.google.common.base.Charsets;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -47,13 +47,13 @@ public class ZeusRabbitGateway {
 	private Map<ConnectedServer, Channel> incomingChannels;
 	private Map<ConnectedServer, Channel> outgoingChannels;
 	private List<ConnectedServer> connectedServers;
-	private AbstractRabbitInputHandler inputHandler;
+	private ZeusRabbitInputHandler inputHandler;
 
 	public ZeusRabbitGateway(ConnectionFactory connFac, Collection<ConnectedServer> connectedServers, Logger logger) {
 		this.connectionFactory = connFac;
 		this.logger = logger;
 		this.connectedServers = new ArrayList<>(connectedServers);
-		this.inputHandler = new ZeusRabbitInputHandler(new TransactionIdManager("zeus"), logger);
+		this.inputHandler = new ZeusRabbitInputHandler(new TransactionIdManager("zeus", logger::info), logger);
 		this.incomingChannels = new HashMap<>();
 		this.outgoingChannels = new HashMap<>();
 		instance = this;
@@ -90,6 +90,10 @@ public class ZeusRabbitGateway {
 		}
 	}
 
+	public ZeusRabbitInputHandler getInputHandler() {
+		return inputHandler;
+	}
+
 	private boolean sendMessage(ConnectedServer server, String msg) {
 		Channel chan = outgoingChannels.get(server);
 		if (chan == null) {
@@ -97,9 +101,9 @@ public class ZeusRabbitGateway {
 		}
 		try {
 			if (ZeusMain.getInstance().getConfigManager().debugRabbit()) {
-				logger.info("[X] R_OUT [" + server.getID() + "]: " + msg);
+				logger.info(String.format("[X] R_OUT [%s]: %s", server.getID(), msg));
 			}
-			chan.basicPublish("", getChannelFromZeus(server.getID()), null, msg.getBytes("UTF-8"));
+			chan.basicPublish("", getChannelFromZeus(server.getID()), null, msg.getBytes(Charsets.UTF_8));
 			return true;
 		} catch (Exception e) {
 			logger.error("Failed to send rabbit message", e);
@@ -110,7 +114,7 @@ public class ZeusRabbitGateway {
 	public boolean sendMessage(ConnectedServer server, JSONObject json) {
 		return sendMessage(server, json.toString());
 	}
-	
+
 	public boolean sendMessage(ConnectedServer server, RabbitMessage msg) {
 		return sendMessage(server, msg.getJSON());
 	}
@@ -121,7 +125,7 @@ public class ZeusRabbitGateway {
 			sendMessage(server, json.toString());
 		}
 	}
-	
+
 	public void broadcastToAll(JSONObject json) {
 		for (ConnectedServer server : this.connectedServers) {
 			sendMessage(server, json.toString());
@@ -129,7 +133,7 @@ public class ZeusRabbitGateway {
 	}
 
 	public boolean setup() {
-		InteractiveRabbitCommand.setSendingLambda((s,p) -> sendMessage(s,p.getJSON()));	
+		InteractiveRabbitCommand.setSendingLambda((s, p) -> sendMessage(s, p.getJSON()));
 		try {
 			conn = connectionFactory.newConnection();
 			for (ConnectedServer server : connectedServers) {

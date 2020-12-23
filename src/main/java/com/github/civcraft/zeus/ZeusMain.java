@@ -44,7 +44,8 @@ public final class ZeusMain {
 	private ZeusDAO dao;
 	private ZeusPluginManager pluginManager;
 	private EventBroadcaster eventManager;
-	 private ScheduledExecutorService transactionCleanupThread;
+	private WhitelistManager whitelistManager;
+	private ScheduledExecutorService transactionCleanupThread;
 	private boolean isRunning = true;
 
 	private ZeusMain() {
@@ -67,6 +68,7 @@ public final class ZeusMain {
 		this.broadcastInterestTracker = new BroadcastInterestTracker();
 		this.serverManager = new ServerManager(configManager.parseClientServers());
 		this.serverPlacementManager = new ServerPlacementManager();
+		this.whitelistManager = new WhitelistManager(dao, configManager.getWhiteListLevel());
 		this.transactionIdManager = new TransactionIdManager("zeus", logger::info);
 		if (!startRabbit()) {
 			logger.error("Failed to start rabbit, exiting");
@@ -75,13 +77,13 @@ public final class ZeusMain {
 		this.commandHandler = new ZeusCommandHandler(logger);
 		this.pluginManager.enableAllPlugins();
 		transactionCleanupThread = Executors.newScheduledThreadPool(1);
-		transactionCleanupThread.scheduleAtFixedRate(transactionIdManager::updateTimeouts, 10, 10, TimeUnit.MILLISECONDS);
+		transactionCleanupThread.scheduleAtFixedRate(transactionIdManager::updateTimeouts, 10, 10,
+				TimeUnit.MILLISECONDS);
 		parseInput();
 	}
 
 	private boolean startRabbit() {
-		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(),
-				logger);
+		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(), logger);
 		if (!rabbitGateway.setup()) {
 			return false;
 		}
@@ -132,27 +134,31 @@ public final class ZeusMain {
 	public ZeusRabbitGateway getRabbitGateway() {
 		return rabbitGateway;
 	}
-	
+
 	public ZeusDAO getDAO() {
 		return dao;
 	}
-	
+
 	public ZeusPlayerManager getPlayerManager() {
 		return playerManager;
 	}
-	
+
 	public ZeusPluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
+
 	public EventBroadcaster getEventManager() {
 		return eventManager;
+	}
+
+	public WhitelistManager getWhitelistManager() {
+		return whitelistManager;
 	}
 
 	public ServerPlacementManager getServerPlacementManager() {
 		return serverPlacementManager;
 	}
-	
+
 	public ZeusConfigManager getConfigManager() {
 		return configManager;
 	}

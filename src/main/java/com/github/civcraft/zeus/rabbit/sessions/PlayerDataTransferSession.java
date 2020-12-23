@@ -7,7 +7,7 @@ import com.github.civcraft.zeus.rabbit.PlayerSpecificPacketSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerDataTransferSession extends PlayerSpecificPacketSession {
-	private byte [] data;
+	private byte[] data;
 	private ZeusLocation location;
 	private int requestAttempt;
 
@@ -15,24 +15,24 @@ public class PlayerDataTransferSession extends PlayerSpecificPacketSession {
 		super(source, transactionID, player);
 		this.requestAttempt = 0;
 	}
-	
+
 	public int getRequestAttempts() {
 		return requestAttempt;
 	}
-	
+
 	public void incrementRequestAttempts() {
 		requestAttempt++;
 	}
-	
-	public void setData(byte [] data, ZeusLocation location) {
+
+	public void setData(byte[] data, ZeusLocation location) {
 		this.data = data;
 		this.location = location;
 	}
-	
-	public byte [] getData() {
+
+	public byte[] getData() {
 		return data;
 	}
-	
+
 	public ZeusLocation getLocation() {
 		return location;
 	}
@@ -40,7 +40,7 @@ public class PlayerDataTransferSession extends PlayerSpecificPacketSession {
 	@Override
 	public void handleTimeout() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

@@ -27,13 +27,14 @@ public class BroadcastInterestTracker {
 	public synchronized boolean removeInterest(ConnectedServer server, String interest) {
 		return getLocalSet(interest).remove(server);
 	}
-	
+
 	public synchronized Set<ConnectedServer> getInterestedServers(String interest) {
 		return Collections.unmodifiableSet(getLocalSet(interest));
 	}
-	
-	public synchronized void broadcastMessage(String interest, RabbitMessage message) {
-		ZeusRabbitGateway.getInstance().broadcastMessage(getInterestedServers(interest), message.getJSON());
+
+	public synchronized void broadcastMessage(RabbitMessage message) {
+		ZeusRabbitGateway.getInstance().broadcastMessage(getInterestedServers(message.getIdentifier()),
+				message.getJSON());
 	}
 
 }

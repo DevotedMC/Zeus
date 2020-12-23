@@ -5,12 +5,9 @@ package com.github.civcraft.zeus.servers;
  *
  */
 public class ArtemisServer extends ConnectedServer {
-	
-
 
 	public ArtemisServer(String id) {
 		super(id);
-	}	
-	
+	}
 
 }

@@ -19,7 +19,7 @@ import com.github.civcraft.zeus.servers.ConnectedServer;
  *
  */
 public class PlayerLocationRequest extends InteractiveRabbitCommand<LocationRequestSession> {
-	
+
 	public static final String ID = "player_loc_request";
 
 	@Override

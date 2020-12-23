@@ -5,9 +5,9 @@ import org.json.JSONObject;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
 public class ConfirmInitialPlayerLogin extends RabbitMessage {
-	
+
 	public static final String ID = "accept_player_initial_login";
-	
+
 	private String targetServer;
 	private String playerName;
 

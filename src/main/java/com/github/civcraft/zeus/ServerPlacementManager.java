@@ -13,19 +13,19 @@ import com.github.civcraft.zeus.servers.ArtemisServer;
 import com.google.common.base.Preconditions;
 
 public class ServerPlacementManager {
-	
-	private Set<ConnectedMapState> parts; //TODO O(log(n)) instead of O(n)
+
+	private Set<ConnectedMapState> parts; // TODO O(log(n)) instead of O(n)
 	private List<ConnectedMapState> randomSpawnTargets;
 	private Random rng;
-	
+
 	public ServerPlacementManager() {
 		parts = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		randomSpawnTargets = new ArrayList<>();
 		rng = new Random();
 	}
-	
+
 	public ArtemisServer getTargetServer(ArtemisServer source, ZeusLocation location) {
-		for(ConnectedMapState part : parts) {
+		for (ConnectedMapState part : parts) {
 			if (part.equals(source)) {
 				continue;
 			}
@@ -35,7 +35,7 @@ public class ServerPlacementManager {
 		}
 		return null;
 	}
-	
+
 	public ArtemisServer getTargetServer(ZeusLocation location) {
 		if (location == null) {
 			if (randomSpawnTargets.isEmpty()) {
@@ -46,14 +46,14 @@ public class ServerPlacementManager {
 				return randomSpawnTargets.get(index).getServer();
 			}
 		}
-		for(ConnectedMapState part : parts) {
+		for (ConnectedMapState part : parts) {
 			if (part.isInside(location)) {
 				return part.getServer();
 			}
 		}
 		return null;
 	}
-	
+
 	public void registerMapPart(ConnectedMapState map) {
 		Preconditions.checkNotNull(map.getServer());
 		parts.add(map);

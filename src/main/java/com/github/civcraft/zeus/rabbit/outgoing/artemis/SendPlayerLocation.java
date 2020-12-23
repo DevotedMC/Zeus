@@ -7,11 +7,11 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.google.common.base.Preconditions;
 
 public class SendPlayerLocation extends RabbitMessage {
-	
+
 	public static final String ID = "reply_location_request";
 
 	private ZeusLocation location;
-	
+
 	public SendPlayerLocation(String transactionID, ZeusLocation location) {
 		super(transactionID);
 		Preconditions.checkNotNull(location);

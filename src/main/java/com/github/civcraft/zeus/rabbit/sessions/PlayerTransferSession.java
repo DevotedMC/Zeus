@@ -22,11 +22,10 @@ public class PlayerTransferSession extends PlayerSpecificPacketSession {
 		Preconditions.checkNotNull(location);
 		this.location = location;
 	}
-	
+
 	public ZeusLocation getLocation() {
 		return location;
 	}
-	
 
 	public void setSourceServer(ArtemisServer server) {
 		this.sourceServer = server;
@@ -43,7 +42,7 @@ public class PlayerTransferSession extends PlayerSpecificPacketSession {
 	public ArtemisServer getTargetServer() {
 		return targetServer;
 	}
-	
+
 	@Override
 	protected long getExpirationTime() {
 		return 7_000L;

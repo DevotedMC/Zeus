@@ -43,4 +43,11 @@ public abstract class RabbitMessage {
 	 */
 	public abstract String getIdentifier();
 
+	/**
+	 * @return ID uniquely identifying this message exchange
+	 */
+	public String getTransactionID() {
+		return transactionID;
+	}
+
 }

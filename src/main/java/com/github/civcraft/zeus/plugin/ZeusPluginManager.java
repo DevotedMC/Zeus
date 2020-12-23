@@ -74,7 +74,7 @@ public class ZeusPluginManager {
 				break;
 			}
 		}
-		for(ZeusPlugin plugin: enableOrder) {
+		for (ZeusPlugin plugin : enableOrder) {
 			startPlugin(plugin);
 		}
 	}
@@ -87,8 +87,9 @@ public class ZeusPluginManager {
 	public void startPlugin(ZeusPlugin plugin) {
 		logger.info("Enabling plugin " + plugin.getName() + ":" + plugin.getVersion());
 		ZeusMain.getInstance().getEventManager().broadcast(new PluginEnableEvent(plugin));
-		plugin.enable(logger, new File(mainServerFolder, ZeusPluginService.PLUGIN_FOLDER));
-		activePlugins.add(plugin);
+		if (plugin.enable(logger, new File(mainServerFolder, ZeusPluginService.PLUGIN_FOLDER))) {
+			activePlugins.add(plugin);
+		}
 	}
 
 	/**

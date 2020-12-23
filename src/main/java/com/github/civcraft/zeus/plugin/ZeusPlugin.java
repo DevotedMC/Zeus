@@ -9,52 +9,60 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.civcraft.zeus.ZeusMain;
 import com.github.civcraft.zeus.plugin.event.ZeusListener;
+import com.github.civcraft.zeus.rabbit.incoming.RabbitRequest;
 
 public abstract class ZeusPlugin {
-	
+
 	private File dataFolder;
 	private ZeusPluginConfig config;
 	private boolean running;
 	protected Logger logger;
-	
-	void enable(Logger logger, File pluginsFolder) {
+
+	boolean enable(Logger logger, File pluginsFolder) {
 		this.logger = logger;
 		this.running = true;
 		this.dataFolder = new File(pluginsFolder, getName());
 		this.config = new ZeusPluginConfig(logger, new File(dataFolder, "config.yml"));
-		onEnable();
+		return onEnable();
 	}
-	
+
 	void disable() {
 		onDisable();
 		this.running = false;
 	}
-	
+
 	/**
 	 * @return Is the plugin active
 	 */
 	public boolean isRunning() {
 		return running;
 	}
-	
+
 	/**
 	 * Automatically called when the plugin is enabled
 	 */
-	public abstract void onEnable();
-	
+	public abstract boolean onEnable();
+
 	/**
 	 * Automatically called when the plugin is disabled
 	 */
 	public abstract void onDisable();
-	
+
 	protected ZeusPluginConfig getConfig() {
 		return config;
 	}
-	
-	protected void registerPluginlistener(ZeusListener listener, ZeusListener ... listeners) {
+
+	protected void registerPluginlistener(ZeusListener listener, ZeusListener... listeners) {
 		ZeusMain.getInstance().getEventManager().registerListener(listener);
-		for(ZeusListener lis : listeners) {
+		for (ZeusListener lis : listeners) {
 			ZeusMain.getInstance().getEventManager().registerListener(lis);
+		}
+	}
+	
+	protected void registerRabbitListener(RabbitRequest request, RabbitRequest ...rabbitRequests) {
+		ZeusMain.getInstance().getRabbitGateway().getInputHandler().registerCommand(request);
+		for (RabbitRequest lis : rabbitRequests) {
+			ZeusMain.getInstance().getRabbitGateway().getInputHandler().registerCommand(lis);
 		}
 	}
 
@@ -75,7 +83,7 @@ public abstract class ZeusPlugin {
 		}
 		return pluginAnnotation.description();
 	}
-	
+
 	public List<String> getDependencies() {
 		ZeusLoad pluginAnnotation = getPluginAnnotation();
 		if (pluginAnnotation == null) {
@@ -114,11 +122,13 @@ public abstract class ZeusPlugin {
 		}
 		return pluginAnnotation.version();
 	}
-	
+
+	@Override
 	public int hashCode() {
 		return getName().hashCode();
 	}
-	
+
+	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof ZeusPlugin)) {
 			return false;

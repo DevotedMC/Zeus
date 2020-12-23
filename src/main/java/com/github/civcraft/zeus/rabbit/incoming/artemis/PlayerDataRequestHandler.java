@@ -15,7 +15,7 @@ import com.github.civcraft.zeus.rabbit.sessions.PlayerDataTransferSession;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDataTransferSession> {
-	
+
 	public static final String ID = "get_player_data";
 
 	@Override
@@ -26,12 +26,13 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDat
 			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
 			return false;
 		}
-		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager().getLoggedInPlayerByUUID(connState.getPlayer());
-		if (zeusPlayerData == null) { //player is offline?
+		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager()
+				.getLoggedInPlayerByUUID(connState.getPlayer());
+		if (zeusPlayerData == null) { // player is offline?
 			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
 			return false;
 		}
-		
+
 		ZeusLocation location = zeusPlayerData.consumeIntendedNextLocation();
 		if (location == null) {
 			location = dao.getLocation(connState.getPlayer());
@@ -43,6 +44,7 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<PlayerDat
 		return true;
 	}
 
+	@Override
 	protected PlayerDataTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
 		return new PlayerDataTransferSession(source, transactionID, player);

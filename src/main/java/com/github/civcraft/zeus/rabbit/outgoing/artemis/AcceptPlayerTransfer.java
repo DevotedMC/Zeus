@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.github.civcraft.zeus.rabbit.RabbitMessage;
 
 public class AcceptPlayerTransfer extends RabbitMessage {
-	
+
 	public static final String ID = "accept_transfer";
 
 	public AcceptPlayerTransfer(String transactionID) {
@@ -19,7 +19,7 @@ public class AcceptPlayerTransfer extends RabbitMessage {
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		// no content		
+		// no content
 	}
 
 }

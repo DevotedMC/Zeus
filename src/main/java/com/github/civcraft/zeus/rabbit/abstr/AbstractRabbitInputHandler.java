@@ -28,8 +28,12 @@ public abstract class AbstractRabbitInputHandler {
 
 	protected abstract void registerCommands();
 
-	protected void registerCommand(RabbitRequest command) {
+	public void registerCommand(RabbitRequest command) {
 		this.commands.put(command.getIdentifier(), command);
+	}
+
+	public void unregisterCommand(RabbitRequest command) {
+		this.commands.remove(command.getIdentifier());
 	}
 
 	public void handle(ConnectedServer sourceServer, String rawJson) {
@@ -37,7 +41,7 @@ public abstract class AbstractRabbitInputHandler {
 		try {
 			input = new JSONObject(rawJson);
 		} catch (JSONException e) {
-			logError("Received invalid json " +  e.toString());
+			logError("Received invalid json " + e.toString());
 			return;
 		}
 		String type = input.getString("%%type");
@@ -67,8 +71,7 @@ public abstract class AbstractRabbitInputHandler {
 				return;
 			}
 			transactionManager.putSession(session);
-		}
-		else {
+		} else {
 			session = transactionManager.getSession(transactionID);
 			if (session == null) {
 				logError("Expected existing transaction for packet of type " + type + ", but found none");
@@ -79,7 +82,7 @@ public abstract class AbstractRabbitInputHandler {
 			transactionManager.deleteSession(transactionID);
 		}
 	}
-	
+
 	protected abstract void logError(String msg);
 
 }

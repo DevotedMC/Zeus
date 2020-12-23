@@ -28,6 +28,7 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 		return true;
 	}
 
+	@Override
 	protected PlayerTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
 		ZeusLocation loc = ZeusLocation.parseLocation(data.getJSONObject("loc"));

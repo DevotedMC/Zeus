@@ -32,7 +32,8 @@ public class TransactionIdManager {
 			while (iter.hasNext()) {
 				PacketSession session = iter.next();
 				if (session.hasExpired()) {
-					infoLogger.accept(String.format("Session %s expired at %d ms", session, session.getExpirationTimestamp()));
+					infoLogger.accept(
+							String.format("Session %s expired at %d ms", session, session.getExpirationTimestamp()));
 					session.handleTimeout();
 					iter.remove();
 					activeSessions.remove(session.getTransactionID());

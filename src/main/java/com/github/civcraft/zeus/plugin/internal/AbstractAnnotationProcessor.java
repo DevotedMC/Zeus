@@ -25,11 +25,11 @@ import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
-public abstract class AbstractAnnotationProcessor <A extends Annotation, P> extends AbstractProcessor {
-	
-	protected abstract Class<A> getAnnotationClass();
-	protected abstract Class<P> getLoadedObjClass();
+public abstract class AbstractAnnotationProcessor<A extends Annotation, P> extends AbstractProcessor {
 
+	protected abstract Class<A> getAnnotationClass();
+
+	protected abstract Class<P> getLoadedObjClass();
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -105,4 +105,3 @@ public abstract class AbstractAnnotationProcessor <A extends Annotation, P> exte
 		return true;
 	}
 }
-

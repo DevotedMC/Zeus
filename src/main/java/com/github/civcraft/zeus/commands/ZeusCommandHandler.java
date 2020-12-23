@@ -9,38 +9,37 @@ import com.github.civcraft.zeus.commands.impl.ShutdownCommand;
 import com.github.civcraft.zeus.commands.sender.CommandSender;
 
 public class ZeusCommandHandler {
-	
+
 	private Map<String, ZeusCommand> commands;
 	private Logger logger;
-	
+
 	public ZeusCommandHandler(Logger logger) {
 		this.logger = logger;
 		this.commands = new HashMap<>();
 		registerCommands();
 	}
-	
+
 	private void registerCommands() {
 		registerCommand(new ShutdownCommand());
 	}
-	
+
 	public void registerCommand(ZeusCommand command) {
 		if (!command.setupInternals(logger)) {
 			logger.warn("Failed to load command " + command.getClass());
 			return;
 		}
 		commands.put(command.getIdentifier().toLowerCase(), command);
-		for(String alt : command.getAlternativeIdentifiers()) {
+		for (String alt : command.getAlternativeIdentifiers()) {
 			commands.putIfAbsent(alt.toLowerCase(), command);
 		}
 	}
-	
+
 	public void handleInput(CommandSender sender, String msg) {
 		int index = msg.indexOf(' ');
 		String identifier;
 		if (index == -1) {
 			identifier = msg;
-		}
-		else {
+		} else {
 			identifier = msg.substring(0, index);
 		}
 		ZeusCommand command = commands.get(identifier.toLowerCase());
@@ -51,12 +50,11 @@ public class ZeusCommandHandler {
 		String args;
 		if (index == -1) {
 			args = "";
-		}
-		else {
+		} else {
 			args = msg.substring(index, msg.length());
 		}
 		command.handle(sender, args);
-		
+
 	}
 
 }

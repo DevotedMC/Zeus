@@ -18,16 +18,17 @@ import com.github.civcraft.zeus.servers.ConnectedServer;
 import com.rabbitmq.client.ConnectionFactory;
 
 public class ZeusConfigManager {
-	
+
 	private static final String configFileName = "config.json";
 	private JSONObject config;
 	private Logger logger;
 	private boolean debugRabbit;
+	private int whiteListLevel;
 
 	public ZeusConfigManager(Logger logger) {
 		this.logger = logger;
 	}
-	
+
 	public boolean reload() {
 		final StringBuilder sb = new StringBuilder();
 		try {
@@ -40,11 +41,12 @@ public class ZeusConfigManager {
 			return false;
 		}
 	}
-	
+
 	private void parse() {
 		debugRabbit = config.getJSONObject("rabbitmq").optBoolean("debug", true);
+		whiteListLevel = config.optInt("whitelist_level", 0);
 	}
-	
+
 	public DBConnection getDatabase() {
 		try {
 			JSONObject json = config.getJSONObject("database");
@@ -60,7 +62,7 @@ public class ZeusConfigManager {
 			return null;
 		}
 	}
-	
+
 	public ConnectionFactory getRabbitConfig() {
 		try {
 			JSONObject json = config.getJSONObject("rabbitmq");
@@ -87,20 +89,24 @@ public class ZeusConfigManager {
 			return null;
 		}
 	}
-	
+
 	public boolean debugRabbit() {
 		return debugRabbit;
 	}
-	
+
+	public int getWhiteListLevel() {
+		return whiteListLevel;
+	}
+
 	public List<ConnectedServer> parseClientServers() {
-		List <ConnectedServer> result = new ArrayList<>();
+		List<ConnectedServer> result = new ArrayList<>();
 		JSONArray serverJson = config.getJSONArray("servers");
-		for(int i = 0; i < serverJson.length(); i++) {
+		for (int i = 0; i < serverJson.length(); i++) {
 			JSONObject json = serverJson.getJSONObject(i);
 			String type = json.getString("type");
 			ConnectedServer parsedServer;
 			String id = json.getString("id");
-			switch(type.toLowerCase()) {
+			switch (type.toLowerCase()) {
 			case "artemis":
 			case "minecraft":
 				parsedServer = new ArtemisServer(id);
@@ -109,8 +115,8 @@ public class ZeusConfigManager {
 			case "bungee":
 				parsedServer = new ApolloServer(id);
 				break;
-				default:
-					parsedServer = null;
+			default:
+				parsedServer = null;
 			}
 			if (parsedServer == null) {
 				logger.error("Failed to parse server " + id + " from config");

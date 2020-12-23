@@ -26,8 +26,8 @@ public class ArtemisStartupHandler extends GenericInteractiveRabbitCommand {
 		int xSize = pos.getInt("x_size");
 		int zSize = pos.getInt("z_size");
 		boolean randomSpawnTarget = pos.getBoolean("random_spawn");
-		ZeusMain.getInstance().getServerPlacementManager()
-				.registerMapPart(new ConnectedMapState((ArtemisServer) sendingServer, corner, xSize, zSize, randomSpawnTarget));
+		ZeusMain.getInstance().getServerPlacementManager().registerMapPart(
+				new ConnectedMapState((ArtemisServer) sendingServer, corner, xSize, zSize, randomSpawnTarget));
 	}
 
 	@Override

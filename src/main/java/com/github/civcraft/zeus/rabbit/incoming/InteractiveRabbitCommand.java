@@ -10,15 +10,16 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.github.civcraft.zeus.servers.ConnectedServer;
 
 public abstract class InteractiveRabbitCommand<S extends PacketSession> extends RabbitRequest {
-	
+
 	private static BiConsumer<ConnectedServer, RabbitMessage> sendLambda;
-	
+
 	public static void setSendingLambda(BiConsumer<ConnectedServer, RabbitMessage> send) {
 		sendLambda = send;
 	}
 
 	public abstract boolean handleRequest(S connState, ConnectedServer sendingServer, JSONObject data);
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean handle(PacketSession connState, ConnectedServer sendingServer, JSONObject data) {
 		return handleRequest((S) connState, sendingServer, data);
@@ -29,13 +30,15 @@ public abstract class InteractiveRabbitCommand<S extends PacketSession> extends 
 	}
 
 	protected void broadcastReply(RabbitMessage message) {
-		ZeusMain.getInstance().getBroadcastInterestTracker().broadcastMessage(getIdentifier(), message);
+		ZeusMain.getInstance().getBroadcastInterestTracker().broadcastMessage(message);
 	}
 
+	@Override
 	public boolean useSession() {
 		return true;
 	}
 
+	@Override
 	public final PacketSession getNewSession(ConnectedServer source, String transactionID, JSONObject data) {
 		return getFreshSession(source, transactionID, data);
 	}

@@ -12,7 +12,7 @@ public class RejectLocationRequest extends RabbitMessage {
 
 	@Override
 	protected void enrichJson(JSONObject json) {
-		
+
 	}
 
 	@Override

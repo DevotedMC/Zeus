@@ -11,7 +11,7 @@ public class GenericSession extends PacketSession {
 
 	@Override
 	public void handleTimeout() {
-		//nothing
+		// nothing
 	}
 
 }

@@ -8,9 +8,9 @@ import com.github.civcraft.zeus.rabbit.RabbitMessage;
 import com.github.civcraft.zeus.servers.ArtemisServer;
 
 public class TransferPlayerToServer extends RabbitMessage {
-	
+
 	public static String ID = "transfer_player_bungee";
-	
+
 	private ArtemisServer targetServer;
 	private UUID player;
 

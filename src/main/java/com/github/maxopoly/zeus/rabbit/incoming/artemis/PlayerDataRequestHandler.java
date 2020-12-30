@@ -1,0 +1,79 @@
+package com.github.maxopoly.zeus.rabbit.incoming.artemis;
+
+import java.util.UUID;
+
+import org.json.JSONObject;
+
+import com.github.maxopoly.zeus.ZeusMain;
+import com.github.maxopoly.zeus.database.ZeusDAO;
+import com.github.maxopoly.zeus.model.GlobalPlayerData;
+import com.github.maxopoly.zeus.model.ZeusLocation;
+import com.github.maxopoly.zeus.rabbit.incoming.InteractiveRabbitCommand;
+import com.github.maxopoly.zeus.rabbit.outgoing.artemis.RejectPlayerDataRequest;
+import com.github.maxopoly.zeus.rabbit.outgoing.artemis.SendPlayerData;
+import com.github.maxopoly.zeus.rabbit.outgoing.artemis.ZeusRequestPlayerData;
+import com.github.maxopoly.zeus.rabbit.sessions.ZeusPlayerDataTransferSession;
+import com.github.maxopoly.zeus.servers.ArtemisServer;
+import com.github.maxopoly.zeus.servers.ConnectedServer;
+
+public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlayerDataTransferSession> {
+
+	public static final String ID = "get_player_data";
+
+	@Override
+	public boolean handleRequest(ZeusPlayerDataTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
+		ZeusDAO dao = ZeusMain.getInstance().getDAO();
+		byte[] playerData = dao.loadAndLockPlayerNBT(connState.getPlayer(), sendingServer);
+		if (playerData == null) {
+			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+			return false;
+		}
+		if (playerData.length == 1) { // signals that another server still has a lock, try to resolve it via read from
+										// that servers local cache and then continue execution
+			String activeServer = dao.getServerLockFor(connState.getPlayer());
+			if (activeServer == null) {
+				sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+				return false;
+			}
+			ConnectedServer server = ZeusMain.getInstance().getServerManager().getServer(activeServer);
+			if (!(server instanceof ArtemisServer)) {
+				sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+				return false;
+			}
+			sendReply(server, new ZeusRequestPlayerData(connState.getTransactionID(), connState.getPlayer()));
+			return true;
+		}
+		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager()
+				.getOnlinePlayerData(connState.getPlayer());
+		if (zeusPlayerData == null) { // player is offline?
+			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+			return false;
+		}
+		ZeusLocation location = zeusPlayerData.consumeIntendedNextLocation();
+		if (location == null) {
+			location = dao.getLocation(connState.getPlayer());
+		}
+		sendReply(sendingServer,
+				new SendPlayerData(connState.getTransactionID(), connState.getPlayer(), playerData, location));
+		// we expect explicit confirmation of the target server regarding them actually
+		// handling the players data
+		return true;
+	}
+
+	@Override
+	protected ZeusPlayerDataTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
+		UUID player = UUID.fromString(data.getString("player"));
+		return new ZeusPlayerDataTransferSession(source, transactionID, player);
+	}
+
+	@Override
+	public String getIdentifier() {
+		return ID;
+	}
+
+	@Override
+	public boolean createSession() {
+		return true;
+	}
+
+}

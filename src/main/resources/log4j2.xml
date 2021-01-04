@@ -14,9 +14,9 @@
 		</RollingRandomAccessFile>
 	</Appenders>
   	<Loggers>
-		<Logger name="com.github.civcraft.zeus.ZeusMain" additivity="false" level="trace">
+		<Root level="trace">
 			<AppenderRef ref="Console" />
 			<AppenderRef ref="File" />
-		</Logger>
+		</Root>
 	</Loggers>
 </Configuration>

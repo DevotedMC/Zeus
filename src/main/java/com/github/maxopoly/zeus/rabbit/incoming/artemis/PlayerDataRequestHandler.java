@@ -28,21 +28,6 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlaye
 			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
 			return false;
 		}
-		if (playerData.length == 1) { // signals that another server still has a lock, try to resolve it via read from
-										// that servers local cache and then continue execution
-			String activeServer = dao.getServerLockFor(connState.getPlayer());
-			if (activeServer == null) {
-				sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
-				return false;
-			}
-			ConnectedServer server = ZeusMain.getInstance().getServerManager().getServer(activeServer);
-			if (!(server instanceof ArtemisServer)) {
-				sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
-				return false;
-			}
-			sendReply(server, new ZeusRequestPlayerData(connState.getTransactionID(), connState.getPlayer()));
-			return true;
-		}
 		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager()
 				.getOnlinePlayerData(connState.getPlayer());
 		if (zeusPlayerData == null) { // player is offline?

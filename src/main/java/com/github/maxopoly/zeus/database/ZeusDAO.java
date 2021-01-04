@@ -36,7 +36,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 						+ "in_loc_x double precision, in_loc_y double precision, in_loc_z double precision) "
 						+ "returns int " + "language plpgsql as $$ " + "declare" + "  existing_data player_data%rowtype;"
 						+ " begin " + "perform pg_advisory_lock(in_lock); "
-						+ "select * from player_data into existing_data ;" + "if not found then"
+						+ "select * from player_data into existing_data where player = in_player;" + "if not found then"
 						+ "  perform pg_advisory_unlock(in_lock);" + "  return 1;" // no prepared
 																					// entry
 																					// available to
@@ -193,7 +193,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 					if (data[0] == 0) {
 						data = new byte[0]; // signals target MC server to create data
 					} else {
-						data = new byte [1]; // error
+						data = null; // error
 					}
 				}
 				return data;

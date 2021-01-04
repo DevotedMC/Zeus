@@ -1,0 +1,2 @@
+com.github.maxopoly.zeus.plugin.internal.ZCommandAnnotationProcessor
+com.github.maxopoly.zeus.plugin.internal.ZeusLoadAnnotationProcessor

@@ -33,6 +33,18 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>${java.compile.version}</source>
+					<target>${java.compile.version}</target>
+					<forceJavacCompilerUse>true</forceJavacCompilerUse>
+					<!-- Needed to compile, because of the annotation processor -->
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

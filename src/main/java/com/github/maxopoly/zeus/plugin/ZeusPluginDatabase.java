@@ -98,7 +98,12 @@ public class ZeusPluginDatabase {
 	public boolean updateDatabase() {
 		setupMigrationTables();
 		// Check update level, etc.
-		int currentLevel = migrations.firstKey() - 1;
+		int currentLevel;
+		if (migrations.isEmpty()) {
+			currentLevel = -1;
+		} else {
+			currentLevel = migrations.firstKey() - 1;
+		}
 		try (Connection connection = db.getConnection();
 				PreparedStatement statement = connection.prepareStatement(
 						"SELECT current_migration_number FROM plugin_versions WHERE plugin_name = ?")) {

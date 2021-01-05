@@ -71,26 +71,19 @@ public final class ZeusMain {
 		this.serverPlacementManager = new ServerPlacementManager();
 		this.whitelistManager = new WhitelistManager(dao, configManager.getWhiteListLevel());
 		this.transactionIdManager = new TransactionIdManager("zeus", logger::info);
-		if (!startRabbit()) {
+		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(), logger);
+		if (!rabbitGateway.setup()) {
 			logger.error("Failed to start rabbit, exiting");
 			System.exit(0);
 		}
+		rabbitGateway.broadcastToAll(new ResetConnectionPacket(transactionIdManager.pullNewTicket()).getJSON());
 		this.commandHandler = new ZeusCommandHandler(logger);
 		this.pluginManager.enableAllPlugins();
+		rabbitGateway.beginAsyncListen(); //begin listen after plugins had the chance to register their rabbit handlers
 		transactionCleanupThread = Executors.newScheduledThreadPool(1);
 		transactionCleanupThread.scheduleAtFixedRate(transactionIdManager::updateTimeouts, 10, 10,
 				TimeUnit.MILLISECONDS);
 		parseInput();
-	}
-
-	private boolean startRabbit() {
-		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(), logger);
-		if (!rabbitGateway.setup()) {
-			return false;
-		}
-		rabbitGateway.beginAsyncListen();
-		rabbitGateway.broadcastToAll(new ResetConnectionPacket(transactionIdManager.pullNewTicket()).getJSON());
-		return true;
 	}
 
 	private void parseInput() {

@@ -33,9 +33,13 @@ public abstract class AbstractRabbitInputHandler {
 		this.commands.put(command.getIdentifier(), command);
 	}
 	
-	public StandardRequestHandler deferCommandToStandardRequest(String id) {
+	public StandardRequestHandler deferCommandToStandardRequest(String id, String ... others) {
 		StandardRequestHandler reqHandler = new StandardRequestHandler(id);
 		registerCommand(reqHandler);
+		for(String other : others) {
+			StandardRequestHandler otherReqHandler = new StandardRequestHandler(other);
+			registerCommand(otherReqHandler);
+		}
 		return reqHandler;
 	}
 

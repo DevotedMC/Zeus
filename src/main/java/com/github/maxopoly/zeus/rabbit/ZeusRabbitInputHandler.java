@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.maxopoly.zeus.model.TransactionIdManager;
 import com.github.maxopoly.zeus.rabbit.abstr.AbstractRabbitInputHandler;
+import com.github.maxopoly.zeus.rabbit.incoming.apollo.PlayerDisconnectHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.apollo.PlayerLoginRequest;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.AcceptPlayerJoin;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.ArtemisShutdownHandler;
@@ -29,6 +30,7 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 	protected void registerCommands() {
 		// apollo
 		registerCommand(new PlayerLoginRequest());
+		registerCommand(new PlayerDisconnectHandler());
 
 		// artemis
 		registerCommand(new AcceptPlayerJoin());

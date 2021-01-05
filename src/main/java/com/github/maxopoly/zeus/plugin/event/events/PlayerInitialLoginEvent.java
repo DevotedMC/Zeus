@@ -93,14 +93,12 @@ public class PlayerInitialLoginEvent extends CancellableEvent {
 	}
 
 	/**
-	 * Sets the message shown to the player if his login is denied and sets the
-	 * login attempt to be cancelled
+	 * Sets the message shown to the player if his login is denied
 	 * 
 	 * @param denyMessage Message to show
 	 */
 	public void setDenyMessage(String denyMessage) {
 		this.denyMessage = denyMessage;
-		setCancelled(true);
 	}
 
 }

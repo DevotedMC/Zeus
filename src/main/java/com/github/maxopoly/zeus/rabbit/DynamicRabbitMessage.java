@@ -12,6 +12,7 @@ public class DynamicRabbitMessage extends RabbitMessage {
 
 	public DynamicRabbitMessage(String transactionID, String identifier, Map<String, Object> values) {
 		super(transactionID);
+		this.identifier = identifier;
 		this.values = values;
 	}
 

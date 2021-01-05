@@ -65,6 +65,11 @@ public class YAMLFileConfig {
 				logger.warn("Failed to create config file " + configFile.getAbsolutePath()
 						+ ", did you setup permissions wrong?");
 			}
+			try {
+				config = YamlParser.loadFromFile(configFile);
+			} catch (IOException ex) {
+				logger.warn("Failed to load freshly created config file " + configFile.getAbsolutePath(), ex);
+			}
 		} catch (InvalidYamlFormatException e) {
 			logger.warn("Failed to load config file " + configFile.getAbsolutePath() + ", was not of valid yaml format",
 					e);

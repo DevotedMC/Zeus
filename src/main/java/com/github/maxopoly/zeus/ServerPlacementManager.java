@@ -25,7 +25,7 @@ public class ServerPlacementManager {
 		rng = new Random();
 	}
 	
-	public void removeServer(ArtemisServer server) {
+	public synchronized void removeServer(ArtemisServer server) {
 		Iterator<ConnectedMapState> iter = parts.iterator();
 		while(iter.hasNext()) {
 			ConnectedMapState next = iter.next();
@@ -74,7 +74,7 @@ public class ServerPlacementManager {
 		return null;
 	}
 
-	public void registerMapPart(ConnectedMapState map) {
+	public synchronized void registerMapPart(ConnectedMapState map) {
 		Preconditions.checkNotNull(map.getServer());
 		parts.add(map);
 		randomSpawnTargets.remove(map);

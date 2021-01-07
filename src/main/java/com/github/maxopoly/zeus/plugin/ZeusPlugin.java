@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.maxopoly.zeus.commands.ZeusCommand;
 import org.apache.logging.log4j.Logger;
 
 import com.github.maxopoly.zeus.ZeusMain;
@@ -52,7 +53,7 @@ public abstract class ZeusPlugin {
 		return config;
 	}
 
-	protected void registerPluginlistener(ZeusListener listener, ZeusListener... listeners) {
+	protected void registerPluginListener(ZeusListener listener, ZeusListener... listeners) {
 		ZeusMain.getInstance().getEventManager().registerListener(listener);
 		for (ZeusListener lis : listeners) {
 			ZeusMain.getInstance().getEventManager().registerListener(lis);
@@ -63,6 +64,13 @@ public abstract class ZeusPlugin {
 		ZeusMain.getInstance().getRabbitGateway().getInputHandler().registerCommand(request);
 		for (RabbitRequest lis : rabbitRequests) {
 			ZeusMain.getInstance().getRabbitGateway().getInputHandler().registerCommand(lis);
+		}
+	}
+
+	protected void registerCommand(ZeusCommand command, ZeusCommand... commands) {
+		ZeusMain.getInstance().getCommandHandler().registerCommand(command);
+		for (ZeusCommand com : commands) {
+			ZeusMain.getInstance().getCommandHandler().registerCommand(com);
 		}
 	}
 

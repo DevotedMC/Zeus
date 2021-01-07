@@ -130,6 +130,10 @@ public final class ZeusMain {
 		return broadcastInterestTracker;
 	}
 
+	public ZeusCommandHandler getCommandHandler() {
+		return commandHandler;
+	}
+
 	public ZeusRabbitGateway getRabbitGateway() {
 		return rabbitGateway;
 	}

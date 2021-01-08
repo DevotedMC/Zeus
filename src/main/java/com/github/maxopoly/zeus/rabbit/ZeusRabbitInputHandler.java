@@ -14,6 +14,8 @@ import com.github.maxopoly.zeus.rabbit.incoming.artemis.PlayerDataTargetConfirm;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.PlayerInitTransferRequest;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.PlayerLocationRequest;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.ReceivePlayerData;
+import com.github.maxopoly.zeus.rabbit.incoming.artemis.RequestPlayerNameHandler;
+import com.github.maxopoly.zeus.rabbit.incoming.artemis.RequestPlayerUUIDHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.SendPlayerReply;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.ServerWhitelistLevelChange;
 
@@ -43,6 +45,8 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 		registerCommand(new ReceivePlayerData());
 		registerCommand(new SendPlayerReply());
 		registerCommand(new ServerWhitelistLevelChange());
+		registerCommand(new RequestPlayerNameHandler());
+		registerCommand(new RequestPlayerUUIDHandler());
 
 		// registerCommand(new AddBroadcastInterest());
 		// registerCommand(new RemoveBroadcastInterest());

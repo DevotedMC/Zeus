@@ -29,8 +29,11 @@ public abstract class AbstractRabbitInputHandler {
 
 	protected abstract void registerCommands();
 
-	public void registerCommand(RabbitRequest command) {
+	public void registerCommand(RabbitRequest command, RabbitRequest ... comms) {
 		this.commands.put(command.getIdentifier(), command);
+		for(RabbitRequest comm : comms) {
+			this.commands.put(comm.getIdentifier(), comm);
+		}
 	}
 	
 	public StandardRequestHandler deferCommandToStandardRequest(String id, String ... others) {

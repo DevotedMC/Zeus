@@ -111,6 +111,11 @@ public final class ZeusMain {
 	public void shutDown() {
 		rabbitGateway.shutdown();
 		try {
+			transactionCleanupThread.awaitTermination(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		try {
 			configManager.getDatabase().close();
 		} catch (SQLException e) {
 			logger.error("Failed to close db", e);

@@ -106,7 +106,7 @@ public class ZeusPluginDatabase {
 		}
 		try (Connection connection = db.getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-						"SELECT current_migration_number FROM plugin_versions WHERE plugin_name = ?")) {
+						"SELECT current_migration_number FROM ze_plugin_versions WHERE plugin_name = ?")) {
 			statement.setString(1, identifier);
 			try (ResultSet set = statement.executeQuery();) {
 				if (set.next()) {
@@ -149,7 +149,7 @@ public class ZeusPluginDatabase {
 				if (doMigration(id, migration.migrations, migration.postMigration)) {
 					logger.info("Migration [" + id + " ] Successful");
 					try (Connection connection = db.getConnection();
-							PreparedStatement statement = connection.prepareStatement("INSERT INTO plugin_versions "
+							PreparedStatement statement = connection.prepareStatement("INSERT INTO ze_plugin_versions "
 									+ "(plugin_name, current_migration_number, last_migration) "
 									+ "VALUES (?, ?, NOW()) on conflict (plugin_name) do update "
 									+ "set current_migration_number = EXCLUDED.current_migration_number, "
@@ -214,7 +214,7 @@ public class ZeusPluginDatabase {
 	private void setupMigrationTables() {
 		try (Connection connection = db.getConnection();) {
 			try (Statement statement = connection.createStatement();) {
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_versions (managed_id SERIAL PRIMARY KEY, "
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS ze_plugin_versions (managed_id SERIAL PRIMARY KEY, "
 						+ "plugin_name VARCHAR(120) UNIQUE NOT NULL, management_began TIMESTAMP NOT NULL DEFAULT NOW(), "
 						+ "current_migration_number INT NOT NULL, last_migration TIMESTAMP);");
 			}

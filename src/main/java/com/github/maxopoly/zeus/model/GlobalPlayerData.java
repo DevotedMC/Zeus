@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 public class GlobalPlayerData extends PlayerData {
 
 	private ArtemisServer mcServer;
-	private ApolloServer bungeeServer;
+	private final ApolloServer bungeeServer;
 	private ZeusLocation intendedNextLocation;
 
 	public GlobalPlayerData(UUID uuid, String name, ApolloServer bungeeServer) {
@@ -42,6 +42,10 @@ public class GlobalPlayerData extends PlayerData {
 	 */
 	public ArtemisServer getMCServer() {
 		return mcServer;
+	}
+	
+	public void setMCServer(ArtemisServer server) {
+		this.mcServer = server;
 	}
 
 }

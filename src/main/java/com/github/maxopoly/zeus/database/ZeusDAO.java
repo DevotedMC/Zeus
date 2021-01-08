@@ -21,22 +21,22 @@ public class ZeusDAO extends ZeusPluginDatabase {
 	}
 
 	private void registerMigrations() {
-		registerMigration(1, "CREATE TABLE IF NOT EXISTS player_data "
+		registerMigration(1, "CREATE TABLE IF NOT EXISTS ze_player_data "
 				+ "(player uuid primary key, data bytea, active_server varchar(255), "
 				+ "world varchar(255), loc_x double precision, loc_y double precision, loc_z double precision);",
 
-				"CREATE TABLE IF NOT EXISTS player_names (player uuid primary key, name varchar(16));",
+				"CREATE TABLE IF NOT EXISTS ze_player_names (player uuid primary key, name varchar(16));",
 
-				"CREATE UNIQUE INDEX player_names_lower ON player_names ((lower(name)));",
+				"CREATE UNIQUE INDEX player_names_lower ON ze_player_names ((lower(name)));",
 
 				// this was a lot better before it got somehow autoformatted. Let's wait for
 				// proper java 15 support (text blocks) before we fix it
 				"CREATE OR REPLACE FUNCTION insert_player_data "
 						+ "(in_lock bigint, in_player uuid, in_data bytea, in_server varchar(255), in_world varchar(255),"
 						+ "in_loc_x double precision, in_loc_y double precision, in_loc_z double precision) "
-						+ "returns int " + "language plpgsql as $$ " + "declare" + "  existing_data player_data%rowtype;"
+						+ "returns int " + "language plpgsql as $$ " + "declare" + "  existing_data ze_player_data%rowtype;"
 						+ " begin " + "perform pg_advisory_lock(in_lock); "
-						+ "select * from player_data into existing_data where player = in_player;" + "if not found then"
+						+ "select * from ze_player_data into existing_data where player = in_player;" + "if not found then"
 						+ "  perform pg_advisory_unlock(in_lock);" + "  return 1;" // no prepared
 																					// entry
 																					// available to
@@ -44,35 +44,35 @@ public class ZeusDAO extends ZeusPluginDatabase {
 						+ "else" + "  if existing_data.active_server != in_server then"
 						+ "    perform pg_advisory_unlock(in_lock);" + "    return 2;" // existing data lock from other
 																						// server
-						+ "  else" + "    update player_data set data = in_data, active_server = null, world = in_world, "
+						+ "  else" + "    update ze_player_data set data = in_data, active_server = null, world = in_world, "
 						+ "      loc_x = in_loc_x, loc_y = in_loc_y, loc_z = in_loc_z where player = in_player;"
 						+ "  end if; " + "end if; " + "perform pg_advisory_unlock(in_lock); " + "return 3;" // success
 						+ "end;" + "$$",
 
 				"CREATE OR REPLACE FUNCTION prep_player_login "
 						+ "(in_lock bigint, in_player uuid, in_server varchar(255))" + " returns bytea "
-						+ "language plpgsql " + "as $$ " + "declare" + "  existing_data player_data%rowtype;" + " begin "
+						+ "language plpgsql " + "as $$ " + "declare" + "  existing_data ze_player_data%rowtype;" + " begin "
 						+ "perform pg_advisory_lock(in_lock);"
-						+ "select * into existing_data from player_data where player = in_player;" + "if not found then" // initial
+						+ "select * into existing_data from ze_player_data where player = in_player;" + "if not found then" // initial
 																														// data
 																														// insert
-						+ "  insert into player_data (player, data, active_server, world, loc_x, loc_y, loc_z) "
+						+ "  insert into ze_player_data (player, data, active_server, world, loc_x, loc_y, loc_z) "
 						+ "    values(in_player, null, in_server, null, null, null, null);"
 						+ "  perform pg_advisory_unlock(in_lock);" + "  return E'\\\\000'::bytea;" // target server will
 																									// generate initial
 																									// data
 						+ "else " + "  if existing_data.active_server is not null then"
 						+ "    perform pg_advisory_unlock(in_lock);" + "    return  E'\\\\001'::bytea;" // signals error
-						+ "  else" + "    update player_data set active_server = in_server where player = in_player;"
+						+ "  else" + "    update ze_player_data set active_server = in_server where player = in_player;"
 						+ "    perform pg_advisory_unlock(in_lock);" + "    return existing_data.data;" + "  end if;"
 						+ "end if;" + "end;" + "$$",
 
-				"CREATE TABLE IF NOT EXISTS whitelist (player uuid primary key, level INT NOT NULL);");
+				"CREATE TABLE IF NOT EXISTS ze_whitelist (player uuid primary key, level INT NOT NULL);");
 	}
 
 	public int getWhitelistLevel(UUID uuid) {
 		try (Connection conn = db.getConnection();
-				PreparedStatement prep = conn.prepareStatement("select level from whitelist where player = ?")) {
+				PreparedStatement prep = conn.prepareStatement("select level from ze_whitelist where player = ?")) {
 			prep.setObject(1, uuid);
 			try (ResultSet rs = prep.executeQuery()) {
 				if (!rs.next()) {
@@ -90,7 +90,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 	public String getPlayerName(UUID uuid) {
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn
-						.prepareStatement("select name from player_names where player = ?")) {
+						.prepareStatement("select name from ze_player_names where player = ?")) {
 			prep.setObject(1, uuid);
 			try (ResultSet rs = prep.executeQuery()) {
 				if (!rs.next()) {
@@ -109,7 +109,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 		name = name.toLowerCase();
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn
-						.prepareStatement("select player from player_names where lower(name) = ?")) {
+						.prepareStatement("select player from ze_player_names where lower(name) = ?")) {
 			prep.setString(1, name);
 			try (ResultSet rs = prep.executeQuery()) {
 				if (!rs.next()) {
@@ -127,7 +127,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 	public void setPlayerName(UUID uuid, String name) {
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn.prepareStatement(
-						"insert into player_names(player,name) values(?,?) on conflict (player) do update set name = EXCLUDED.name")) {
+						"insert into ze_player_names(player,name) values(?,?) on conflict (player) do update set name = EXCLUDED.name")) {
 			prep.setObject(1, uuid);
 			prep.setString(2, name);
 			prep.execute();
@@ -142,7 +142,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 		}
 		if (level == 0) {
 			try (Connection conn = db.getConnection();
-					PreparedStatement prep = conn.prepareStatement("delete from whitelist where player = ?")) {
+					PreparedStatement prep = conn.prepareStatement("delete from ze_whitelist where player = ?")) {
 				prep.setObject(1, uuid);
 				prep.execute();
 			} catch (SQLException e) {
@@ -152,7 +152,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 		}
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn.prepareStatement(
-						"insert into whitelist(player,level) values(?,?) on conflict (player) do update set level = EXCLUDED.level")) {
+						"insert into ze_whitelist(player,level) values(?,?) on conflict (player) do update set level = EXCLUDED.level")) {
 			prep.setObject(1, uuid);
 			prep.setInt(2, level);
 			prep.execute();
@@ -164,7 +164,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 	public String getServerLockFor(UUID uuid) {
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn
-						.prepareStatement("select active_server from player_data where player = ?")) {
+						.prepareStatement("select active_server from ze_player_data where player = ?")) {
 			prep.setObject(1, uuid);
 			try (ResultSet rs = prep.executeQuery()) {
 				if (!rs.next()) {
@@ -207,7 +207,7 @@ public class ZeusDAO extends ZeusPluginDatabase {
 	public ZeusLocation getLocation(UUID uuid) {
 		try (Connection conn = db.getConnection();
 				PreparedStatement prep = conn
-						.prepareStatement("select world, loc_x, loc_y, loc_z from player_data where player = ?;")) {
+						.prepareStatement("select world, loc_x, loc_y, loc_z from ze_player_data where player = ?;")) {
 			prep.setObject(1, uuid);
 			try (ResultSet rs = prep.executeQuery()) {
 				if (!rs.next()) {

@@ -5,11 +5,13 @@ import org.json.JSONObject;
 import com.github.maxopoly.zeus.ZeusMain;
 import com.github.maxopoly.zeus.model.GlobalPlayerData;
 import com.github.maxopoly.zeus.model.TransferRejectionReason;
+import com.github.maxopoly.zeus.plugin.event.events.PlayerJoinServerEvent;
 import com.github.maxopoly.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.maxopoly.zeus.rabbit.outgoing.apollo.TransferPlayerToServer;
 import com.github.maxopoly.zeus.rabbit.outgoing.artemis.AcceptPlayerTransfer;
 import com.github.maxopoly.zeus.rabbit.outgoing.artemis.RejectPlayerTransfer;
 import com.github.maxopoly.zeus.rabbit.sessions.PlayerTransferSession;
+import com.github.maxopoly.zeus.servers.ArtemisServer;
 import com.github.maxopoly.zeus.servers.ConnectedServer;
 
 public class AcceptPlayerJoin extends InteractiveRabbitCommand<PlayerTransferSession> {
@@ -32,6 +34,9 @@ public class AcceptPlayerJoin extends InteractiveRabbitCommand<PlayerTransferSes
 			return false;
 		}
 		state.setIntendedNextLocation(connState.getLocation());
+		ArtemisServer previousServer = state.getMCServer();
+		state.setMCServer((ArtemisServer) sendingServer);
+		ZeusMain.getInstance().getEventManager().broadcast(new PlayerJoinServerEvent(state, previousServer, state.getMCServer()));
 		sendReply(connState.getSourceServer(), new AcceptPlayerTransfer(connState.getTransactionID()));
 		sendReply(state.getBungeeServer(), new TransferPlayerToServer(connState.getTransactionID(),
 				connState.getPlayer(), connState.getTargetServer()));

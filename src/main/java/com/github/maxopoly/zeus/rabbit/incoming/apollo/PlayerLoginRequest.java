@@ -10,6 +10,7 @@ import com.github.maxopoly.zeus.ZeusMain;
 import com.github.maxopoly.zeus.model.GlobalPlayerData;
 import com.github.maxopoly.zeus.model.ZeusLocation;
 import com.github.maxopoly.zeus.plugin.event.events.PlayerInitialLoginEvent;
+import com.github.maxopoly.zeus.plugin.event.events.PlayerJoinServerEvent;
 import com.github.maxopoly.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.maxopoly.zeus.rabbit.outgoing.apollo.ConfirmInitialPlayerLogin;
 import com.github.maxopoly.zeus.rabbit.outgoing.apollo.RejectPlayerInitialLogin;
@@ -70,8 +71,9 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 				}
 			}
 		}
-		ZeusMain.getInstance().getPlayerManager()
-				.addPlayer(new GlobalPlayerData(connState.getPlayer(), cachedName, (ApolloServer) sendingServer));
+		GlobalPlayerData gpdata = new GlobalPlayerData(connState.getPlayer(), cachedName, (ApolloServer) sendingServer);
+		ZeusMain.getInstance().getPlayerManager().addPlayer(gpdata);
+		ZeusMain.getInstance().getEventManager().broadcast(new PlayerJoinServerEvent(gpdata, null, target));
 		sendReply(connState.getServerTalkedTo(),
 				new ConfirmInitialPlayerLogin(connState.getTransactionID(), target.getID(), cachedName));
 		return false;

@@ -41,6 +41,11 @@ public class PlayerManager<T extends PlayerData> {
 		cacheNameToUUID.put(data.getName().toLowerCase(), data.getUUID());
 		cacheUUIDToName.put(data.getUUID(), data.getName());
 	}
+	
+	public void addToNameUUIDCache(UUID uuid, String name) {
+		cacheNameToUUID.put(name.toLowerCase(), uuid);
+		cacheUUIDToName.put(uuid, name);
+	}
 
 	public void removeOnlinePlayerData(T data) {
 		playersByUUID.remove(data.getUUID());

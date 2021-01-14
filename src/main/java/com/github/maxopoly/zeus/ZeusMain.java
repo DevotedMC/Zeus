@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import com.github.maxopoly.zeus.commands.ZeusCommandHandler;
 import com.github.maxopoly.zeus.commands.sender.ConsoleSender;
 import com.github.maxopoly.zeus.database.ZeusDAO;
+import com.github.maxopoly.zeus.model.PlayerNameKnowledgeTracker;
 import com.github.maxopoly.zeus.model.TransactionIdManager;
 import com.github.maxopoly.zeus.plugin.ZeusPluginManager;
 import com.github.maxopoly.zeus.plugin.event.EventBroadcaster;
@@ -46,6 +47,7 @@ public final class ZeusMain {
 	private ZeusPluginManager pluginManager;
 	private EventBroadcaster eventManager;
 	private WhitelistManager whitelistManager;
+	private PlayerNameKnowledgeTracker playerNameKnowledgeTracker;
 	private ScheduledExecutorService transactionCleanupThread;
 	private boolean isRunning = true;
 
@@ -71,6 +73,7 @@ public final class ZeusMain {
 		this.serverPlacementManager = new ServerPlacementManager();
 		this.whitelistManager = new WhitelistManager(dao, configManager.getWhiteListLevel());
 		this.transactionIdManager = new TransactionIdManager("zeus", logger::info);
+		this.playerNameKnowledgeTracker = new PlayerNameKnowledgeTracker();
 		rabbitGateway = new ZeusRabbitGateway(configManager.getRabbitConfig(), serverManager.getAllServer(), logger);
 		if (!rabbitGateway.setup()) {
 			logger.error("Failed to start rabbit, exiting");
@@ -149,6 +152,10 @@ public final class ZeusMain {
 
 	public ZeusPluginManager getPluginManager() {
 		return pluginManager;
+	}
+	
+	public PlayerNameKnowledgeTracker getPlayerNameKnowledgeTracker() {
+		return playerNameKnowledgeTracker;
 	}
 
 	public EventBroadcaster getEventManager() {

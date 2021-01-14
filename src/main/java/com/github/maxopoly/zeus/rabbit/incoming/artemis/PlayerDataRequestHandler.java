@@ -8,6 +8,7 @@ import com.github.maxopoly.zeus.ZeusMain;
 import com.github.maxopoly.zeus.database.ZeusDAO;
 import com.github.maxopoly.zeus.model.GlobalPlayerData;
 import com.github.maxopoly.zeus.model.ZeusLocation;
+import com.github.maxopoly.zeus.plugin.event.events.ServerLoadPlayerDataEvent;
 import com.github.maxopoly.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.maxopoly.zeus.rabbit.outgoing.artemis.RejectPlayerDataRequest;
 import com.github.maxopoly.zeus.rabbit.outgoing.artemis.SendPlayerData;
@@ -38,6 +39,7 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlaye
 		if (location == null) {
 			location = dao.getLocation(connState.getPlayer());
 		}
+		ZeusMain.getInstance().getEventManager().broadcast(new ServerLoadPlayerDataEvent(connState.getPlayer(), (ArtemisServer) sendingServer));
 		sendReply(sendingServer,
 				new SendPlayerData(connState.getTransactionID(), connState.getPlayer(), playerData, location));
 		// we expect explicit confirmation of the target server regarding them actually

@@ -53,7 +53,8 @@ public class ZeusCommandHandler {
 		} else {
 			args = msg.substring(index, msg.length());
 		}
-		command.handle(sender, args);
+		String reply = command.handle(sender, args);
+		sender.reply(reply);
 
 	}
 

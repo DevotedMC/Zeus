@@ -121,7 +121,8 @@ public class ZeusConfigManager {
 			switch (type.toLowerCase()) {
 			case "artemis":
 			case "minecraft":
-				parsedServer = new ArtemisServer(id);
+				boolean nonRabbitUser = json.optBoolean("non_rabbit_user", false);
+				parsedServer = new ArtemisServer(id, nonRabbitUser);
 				break;
 			case "apollo":
 			case "bungee":

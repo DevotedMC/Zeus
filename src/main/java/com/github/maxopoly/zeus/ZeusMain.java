@@ -173,6 +173,10 @@ public final class ZeusMain {
 	public ZeusConfigManager getConfigManager() {
 		return configManager;
 	}
+	
+	public ZeusCommandHandler getCommandHandler() {
+		return commandHandler;
+	}
 
 	public Logger getLogger() {
 		return logger;

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ZCommand {
 
-	public static final int DEFAULT_ARG_NUM = -1;
+	int DEFAULT_ARG_NUM = -1;
 
 	String id();
 

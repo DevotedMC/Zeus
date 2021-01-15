@@ -14,6 +14,8 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 
 import com.github.maxopoly.zeus.ZeusMain;
+import com.github.maxopoly.zeus.commands.ZeusCommand;
+import com.github.maxopoly.zeus.commands.ZeusCommandHandler;
 import com.github.maxopoly.zeus.plugin.event.events.PluginDisableEvent;
 import com.github.maxopoly.zeus.plugin.event.events.PluginEnableEvent;
 import com.github.maxopoly.zeus.plugin.internal.ZeusPluginService;
@@ -89,6 +91,7 @@ public class ZeusPluginManager {
 		ZeusMain.getInstance().getEventManager().broadcast(new PluginEnableEvent(plugin));
 		if (plugin.enable(logger, new File(mainServerFolder, ZeusPluginService.PLUGIN_FOLDER))) {
 			activePlugins.add(plugin);
+			registerCommands(plugin);
 		}
 	}
 
@@ -122,6 +125,20 @@ public class ZeusPluginManager {
 		}
 		logger.info("Registering plugin " + name);
 		plugins.put(name.toLowerCase(), plugin);
+	}
+
+	private void registerCommands(ZeusPlugin plugin) {
+		String pluginPackage = plugin.getClass().getPackageName();
+		ZeusCommandHandler commandHandler = ZeusMain.getInstance().getCommandHandler();
+		for (ZeusCommand command : pluginService.getAvailableCommands()) {
+			String classPath = command.getClass().getPackageName();
+			if (!classPath.startsWith(pluginPackage)) {
+				continue;
+			}
+			logger.info("Registering command " + command.getClass().getSimpleName() + " for plugin "
+					+ plugin.getClass().getSimpleName());
+			commandHandler.registerCommand(command);
+		}
 	}
 
 	public void reloadPlugins() {

@@ -52,7 +52,7 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 					new RejectPlayerInitialLogin(connState.getTransactionID(), "No target found"));
 			return false;
 		}
-		if (!target.hasActiveConnection()) {
+		if (!target.isNonRabbitUser() && !target.hasActiveConnection()) {
 			sendReply(connState.getServerTalkedTo(),
 					new RejectPlayerInitialLogin(connState.getTransactionID(), "Target server is offline"));
 			return false;

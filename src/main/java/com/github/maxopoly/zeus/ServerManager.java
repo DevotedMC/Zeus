@@ -33,7 +33,7 @@ public class ServerManager {
 	}
 
 	public ConnectedServer getServer(String identifier) {
-		return null;
+		return servers.get(identifier);
 	}
 
 	public Collection<ConnectedServer> getAllServer() {

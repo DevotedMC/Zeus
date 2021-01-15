@@ -6,8 +6,15 @@ package com.github.maxopoly.zeus.servers;
  */
 public class ArtemisServer extends ConnectedServer {
 
-	public ArtemisServer(String id) {
+	private boolean nonRabbitUser;
+	
+	public ArtemisServer(String id, boolean nonRabbitUser) {
 		super(id);
+		this.nonRabbitUser = nonRabbitUser;
+	}
+	
+	public boolean isNonRabbitUser() {
+		return nonRabbitUser;
 	}
 
 }

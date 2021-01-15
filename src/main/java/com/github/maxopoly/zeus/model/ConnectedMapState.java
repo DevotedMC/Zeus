@@ -9,10 +9,10 @@ public class ConnectedMapState {
 	private int xSize;
 	private int zSize;
 	private ArtemisServer server;
-	private boolean randomSpawnTarget;
+	private boolean firstSpawnTarget;
 
 	public ConnectedMapState(ArtemisServer server, ZeusLocation upperLeftCorner, int xSize, int zSize,
-			boolean randomSpawnTarget) {
+			boolean firstSpawnTarget) {
 		Preconditions.checkNotNull(upperLeftCorner);
 		Preconditions.checkArgument(xSize > 0);
 		Preconditions.checkArgument(zSize > 0);
@@ -20,11 +20,11 @@ public class ConnectedMapState {
 		this.xSize = xSize;
 		this.zSize = zSize;
 		this.server = server;
-		this.randomSpawnTarget = randomSpawnTarget;
+		this.firstSpawnTarget = firstSpawnTarget;
 	}
 
-	public boolean isRandomSpawnTarget() {
-		return randomSpawnTarget;
+	public boolean isFirstSpawnTarget() {
+		return firstSpawnTarget;
 	}
 
 	public ArtemisServer getServer() {

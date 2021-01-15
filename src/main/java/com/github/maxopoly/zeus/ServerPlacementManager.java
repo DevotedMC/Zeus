@@ -16,12 +16,12 @@ import com.google.common.base.Preconditions;
 public class ServerPlacementManager {
 
 	private Set<ConnectedMapState> parts; // TODO O(log(n)) instead of O(n)
-	private List<ConnectedMapState> randomSpawnTargets;
+	private List<ConnectedMapState> firstSpawnTargets;
 	private Random rng;
 
 	public ServerPlacementManager() {
 		parts = Collections.newSetFromMap(new ConcurrentHashMap<>());
-		randomSpawnTargets = new ArrayList<>();
+		firstSpawnTargets = new ArrayList<>();
 		rng = new Random();
 	}
 	
@@ -33,8 +33,8 @@ public class ServerPlacementManager {
 				iter.remove();
 			}
 		}
-		synchronized (randomSpawnTargets) {
-			iter = randomSpawnTargets.iterator();
+		synchronized (firstSpawnTargets) {
+			iter = firstSpawnTargets.iterator();
 			while(iter.hasNext()) {
 				ConnectedMapState next = iter.next();
 				if (next.getServer().equals(server)) {
@@ -58,12 +58,12 @@ public class ServerPlacementManager {
 
 	public ArtemisServer getTargetServer(ZeusLocation location) {
 		if (location == null) {
-			if (randomSpawnTargets.isEmpty()) {
+			if (firstSpawnTargets.isEmpty()) {
 				return null;
 			}
-			synchronized (randomSpawnTargets) {
-				int index = rng.nextInt(randomSpawnTargets.size());
-				return randomSpawnTargets.get(index).getServer();
+			synchronized (firstSpawnTargets) {
+				int index = rng.nextInt(firstSpawnTargets.size());
+				return firstSpawnTargets.get(index).getServer();
 			}
 		}
 		for (ConnectedMapState part : parts) {
@@ -77,10 +77,10 @@ public class ServerPlacementManager {
 	public synchronized void registerMapPart(ConnectedMapState map) {
 		Preconditions.checkNotNull(map.getServer());
 		parts.add(map);
-		randomSpawnTargets.remove(map);
-		if (map.isRandomSpawnTarget()) {
-			synchronized (randomSpawnTargets) {
-				randomSpawnTargets.add(map);
+		firstSpawnTargets.remove(map);
+		if (map.isFirstSpawnTarget()) {
+			synchronized (firstSpawnTargets) {
+				firstSpawnTargets.add(map);
 			}
 		}
 	}

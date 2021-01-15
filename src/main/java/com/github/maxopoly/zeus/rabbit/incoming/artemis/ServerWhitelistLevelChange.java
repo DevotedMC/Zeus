@@ -8,6 +8,8 @@ import com.github.maxopoly.zeus.servers.ArtemisServer;
 import com.github.maxopoly.zeus.servers.ConnectedServer;
 
 public class ServerWhitelistLevelChange extends StaticRabbitCommand {
+	
+	public static final String ID = "set_whitelist_level";
 
 	@Override
 	public void handleRequest(ConnectedServer sendingServer, JSONObject data) {
@@ -17,7 +19,7 @@ public class ServerWhitelistLevelChange extends StaticRabbitCommand {
 
 	@Override
 	public String getIdentifier() {
-		return "set_whitelist_level";
+		return ID;
 	}
 
 }

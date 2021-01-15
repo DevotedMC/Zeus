@@ -25,6 +25,7 @@ public class ZeusConfigManager {
 	private boolean debugRabbit;
 	private int whiteListLevel;
 	private boolean allowNameChanges;
+	private String lobbyShard;
 
 	public ZeusConfigManager(Logger logger) {
 		this.logger = logger;
@@ -47,6 +48,7 @@ public class ZeusConfigManager {
 		debugRabbit = config.getJSONObject("rabbitmq").optBoolean("debug", true);
 		whiteListLevel = config.optInt("whitelist_level", 0);
 		allowNameChanges = config.optBoolean("allow_namechanges", false);
+		lobbyShard = config.optString("lobby", null);
 	}
 
 	public DBConnection getDatabase() {
@@ -102,6 +104,10 @@ public class ZeusConfigManager {
 	
 	public boolean allowNameChanges() {
 		return allowNameChanges;
+	}
+	
+	public String getLobbyShard() {
+		return lobbyShard;
 	}
 
 	public List<ConnectedServer> parseClientServers() {

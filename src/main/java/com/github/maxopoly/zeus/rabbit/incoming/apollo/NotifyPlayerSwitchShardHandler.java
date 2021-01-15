@@ -7,18 +7,19 @@ import org.json.JSONObject;
 import com.github.maxopoly.zeus.ZeusMain;
 import com.github.maxopoly.zeus.plugin.event.events.PlayerFinalDisconnectEvent;
 import com.github.maxopoly.zeus.rabbit.incoming.StaticRabbitCommand;
+import com.github.maxopoly.zeus.servers.ArtemisServer;
 import com.github.maxopoly.zeus.servers.ConnectedServer;
 
-public class PlayerDisconnectHandler extends StaticRabbitCommand {
-
-	public static final String ID = "zeus_player_logoff";
+public class NotifyPlayerSwitchShardHandler extends StaticRabbitCommand {
+	
+	public static final String ID = "ze_player_switch_shard";
 	
 	@Override
 	public void handleRequest(ConnectedServer sendingServer, JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
-		PlayerFinalDisconnectEvent event = new PlayerFinalDisconnectEvent(player);
-		ZeusMain.getInstance().getEventManager().broadcast(event);
-		ZeusMain.getInstance().getPlayerManager().removeOnlinePlayerData(player);
+		String server = data.getString("server");
+		ArtemisServer shard = (ArtemisServer) ZeusMain.getInstance().getServerManager().getServer(server); 
+		ZeusMain.getInstance().getPlayerManager().getOnlinePlayerData(player).setMCServer(shard);
 	}
 
 	@Override

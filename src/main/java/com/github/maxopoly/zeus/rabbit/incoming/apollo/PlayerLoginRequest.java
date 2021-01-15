@@ -26,7 +26,7 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 	@Override
 	public boolean handleRequest(ZeusPlayerLoginSession connState, ConnectedServer sendingServer, JSONObject data) {
 		ZeusLocation location = ZeusMain.getInstance().getDAO().getLocation(connState.getPlayer());
-		ArtemisServer target = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(location);
+		ArtemisServer target = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(location, true);
 		boolean whiteListed = ZeusMain.getInstance().getWhitelistManager().canEnterServer(connState.getPlayer(),
 				target);
 		if (!whiteListed) {

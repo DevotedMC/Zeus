@@ -47,7 +47,7 @@ public class PlayerManager<T extends PlayerData> {
 		cacheUUIDToName.put(uuid, name);
 	}
 
-	public void removeOnlinePlayerData(T data) {
-		playersByUUID.remove(data.getUUID());
+	public void removeOnlinePlayerData(UUID uuid) {
+		playersByUUID.remove(uuid);
 	}
 }

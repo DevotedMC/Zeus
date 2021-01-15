@@ -56,8 +56,12 @@ public class ServerPlacementManager {
 		return null;
 	}
 
-	public ArtemisServer getTargetServer(ZeusLocation location) {
+	public ArtemisServer getTargetServer(ZeusLocation location, boolean includeLobby) {
 		if (location == null) {
+			String lobby = ZeusMain.getInstance().getConfigManager().getLobbyShard();
+			if (includeLobby && lobby != null) {
+				return (ArtemisServer) ZeusMain.getInstance().getServerManager().getServer(lobby);
+			}
 			if (firstSpawnTargets.isEmpty()) {
 				return null;
 			}

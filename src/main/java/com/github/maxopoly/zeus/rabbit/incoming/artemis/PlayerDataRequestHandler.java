@@ -22,11 +22,13 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlaye
 	public static final String ID = "get_player_data";
 
 	@Override
-	public boolean handleRequest(ZeusPlayerDataTransferSession connState, ConnectedServer sendingServer, JSONObject data) {
+	public boolean handleRequest(ZeusPlayerDataTransferSession connState, ConnectedServer sendingServer,
+			JSONObject data) {
 		ZeusDAO dao = ZeusMain.getInstance().getDAO();
 		byte[] playerData = dao.loadAndLockPlayerNBT(connState.getPlayer(), sendingServer);
 		if (playerData == null) {
 			sendReply(sendingServer, new RejectPlayerDataRequest(connState.getTransactionID()));
+			requestDataUnlock(connState);
 			return false;
 		}
 		GlobalPlayerData zeusPlayerData = ZeusMain.getInstance().getPlayerManager()
@@ -39,7 +41,8 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlaye
 		if (location == null) {
 			location = dao.getLocation(connState.getPlayer());
 		}
-		ZeusMain.getInstance().getEventManager().broadcast(new ServerLoadPlayerDataEvent(connState.getPlayer(), (ArtemisServer) sendingServer));
+		ZeusMain.getInstance().getEventManager()
+				.broadcast(new ServerLoadPlayerDataEvent(connState.getPlayer(), (ArtemisServer) sendingServer));
 		sendReply(sendingServer,
 				new SendPlayerData(connState.getTransactionID(), connState.getPlayer(), playerData, location));
 		// we expect explicit confirmation of the target server regarding them actually
@@ -47,8 +50,20 @@ public class PlayerDataRequestHandler extends InteractiveRabbitCommand<ZeusPlaye
 		return true;
 	}
 
+	private void requestDataUnlock(ZeusPlayerDataTransferSession connState) {
+		ZeusDAO dao = ZeusMain.getInstance().getDAO();
+		String serverWithLock = dao.getServerLockFor(connState.getPlayer());
+		ConnectedServer holdingLock = ZeusMain.getInstance().getServerManager().getServer(serverWithLock);
+		if (holdingLock == null) {
+			return;
+		}
+		sendReply(holdingLock, new ZeusRequestPlayerData(
+				ZeusMain.getInstance().getTransactionIdManager().pullNewTicket(), connState.getPlayer()));
+	}
+
 	@Override
-	protected ZeusPlayerDataTransferSession getFreshSession(ConnectedServer source, String transactionID, JSONObject data) {
+	protected ZeusPlayerDataTransferSession getFreshSession(ConnectedServer source, String transactionID,
+			JSONObject data) {
 		UUID player = UUID.fromString(data.getString("player"));
 		return new ZeusPlayerDataTransferSession(source, transactionID, player);
 	}

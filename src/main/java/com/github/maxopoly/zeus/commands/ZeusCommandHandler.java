@@ -51,7 +51,7 @@ public class ZeusCommandHandler {
 		if (index == -1) {
 			args = "";
 		} else {
-			args = msg.substring(index, msg.length());
+			args = msg.substring(index + 1, msg.length());
 		}
 		String reply = command.handle(sender, args);
 		sender.reply(reply);

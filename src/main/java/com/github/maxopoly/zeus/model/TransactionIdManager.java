@@ -1,8 +1,10 @@
 package com.github.maxopoly.zeus.model;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,6 +41,16 @@ public class TransactionIdManager {
 
 	public boolean hasActiveSessions() {
 		return !activeSessions.isEmpty();
+	}
+
+	public void forceCleanupSession() {
+		Set<String> keys = new HashSet<>(activeSessions.keySet());
+		for(String key : keys) {
+			PacketSession session = activeSessions.get(key);
+			if (session != null && session.hasExpired()) {
+				activeSessions.remove(key);
+			}
+		}
 	}
 
 	public void updateTimeouts() {

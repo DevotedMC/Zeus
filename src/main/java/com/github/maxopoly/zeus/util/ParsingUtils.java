@@ -37,6 +37,10 @@ public class ParsingUtils {
 			String typeSuffix = getSuffix(input, Character::isLetter);
 			input = input.substring(0, input.length() - typeSuffix.length());
 			String numberSuffix = getSuffix(input, Character::isDigit);
+			if (typeSuffix.length() == 0 && numberSuffix.length() == 0) {
+				//unparseable character
+				break;
+			}
 			input = input.substring(0, input.length() - numberSuffix.length());
 			long duration;
 			if (numberSuffix.length() == 0) {

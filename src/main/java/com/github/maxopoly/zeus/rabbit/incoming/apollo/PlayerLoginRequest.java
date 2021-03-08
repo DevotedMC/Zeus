@@ -1,11 +1,5 @@
 package com.github.maxopoly.zeus.rabbit.incoming.apollo;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.UUID;
-
-import org.json.JSONObject;
-
 import com.github.maxopoly.zeus.ZeusMain;
 import com.github.maxopoly.zeus.model.GlobalPlayerData;
 import com.github.maxopoly.zeus.model.ZeusLocation;
@@ -14,10 +8,15 @@ import com.github.maxopoly.zeus.plugin.event.events.PlayerJoinServerEvent;
 import com.github.maxopoly.zeus.rabbit.incoming.InteractiveRabbitCommand;
 import com.github.maxopoly.zeus.rabbit.outgoing.apollo.ConfirmInitialPlayerLogin;
 import com.github.maxopoly.zeus.rabbit.outgoing.apollo.RejectPlayerInitialLogin;
+import com.github.maxopoly.zeus.rabbit.outgoing.artemis.GlobalPlayerLogin;
 import com.github.maxopoly.zeus.rabbit.sessions.ZeusPlayerLoginSession;
 import com.github.maxopoly.zeus.servers.ApolloServer;
 import com.github.maxopoly.zeus.servers.ArtemisServer;
 import com.github.maxopoly.zeus.servers.ConnectedServer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.UUID;
+import org.json.JSONObject;
 
 public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLoginSession> {
 
@@ -74,6 +73,14 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 		GlobalPlayerData gpdata = new GlobalPlayerData(connState.getPlayer(), cachedName, (ApolloServer) sendingServer);
 		ZeusMain.getInstance().getPlayerManager().addPlayer(gpdata);
 		ZeusMain.getInstance().getEventManager().broadcast(new PlayerJoinServerEvent(gpdata, null, target));
+		for (ConnectedServer server : ZeusMain.getInstance().getServerManager().getAllServer()) {
+			if (!(server instanceof ArtemisServer)) {
+				continue;
+			}
+			ZeusMain.getInstance().getRabbitGateway().sendMessage(server,
+					new GlobalPlayerLogin(ZeusMain.getInstance().getTransactionIdManager().pullNewTicket(),
+							cachedName, connState.getPlayer()));
+		}
 		sendReply(connState.getServerTalkedTo(),
 				new ConfirmInitialPlayerLogin(connState.getTransactionID(), target.getID(), cachedName));
 		return false;

@@ -26,7 +26,6 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 	public boolean handleRequest(ZeusPlayerLoginSession connState, ConnectedServer sendingServer, JSONObject data) {
 		ZeusLocation location = ZeusMain.getInstance().getDAO().getLocation(connState.getPlayer());
 		ArtemisServer target = ZeusMain.getInstance().getServerPlacementManager().getTargetServer(location, true);
-		ZeusMain.getInstance().getLogger().info("Currently Location " + location + " paired to " + target.getID());
 		boolean whiteListed = ZeusMain.getInstance().getWhitelistManager().canEnterServer(connState.getPlayer(),
 				target);
 		if (!whiteListed) {
@@ -47,7 +46,6 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 			sendReply(connState.getServerTalkedTo(), new RejectPlayerInitialLogin(connState.getTransactionID(), msg));
 			return false;
 		}
-		ZeusMain.getInstance().getLogger().info("After Location " + location + " paired to " + target.getID());
 		if (target == null) {
 			sendReply(connState.getServerTalkedTo(),
 					new RejectPlayerInitialLogin(connState.getTransactionID(), "No target found"));
@@ -75,7 +73,6 @@ public class PlayerLoginRequest extends InteractiveRabbitCommand<ZeusPlayerLogin
 		GlobalPlayerData gpdata = new GlobalPlayerData(connState.getPlayer(), cachedName, (ApolloServer) sendingServer);
 		ZeusMain.getInstance().getPlayerManager().addPlayer(gpdata);
 		ZeusMain.getInstance().getEventManager().broadcast(new PlayerJoinServerEvent(gpdata, null, target));
-		ZeusMain.getInstance().getLogger().info("Nearly Done Location " + location + " paired to " + target.getID());
 		for (ConnectedServer server : ZeusMain.getInstance().getServerManager().getAllServer()) {
 			if (!(server instanceof ArtemisServer)) {
 				continue;

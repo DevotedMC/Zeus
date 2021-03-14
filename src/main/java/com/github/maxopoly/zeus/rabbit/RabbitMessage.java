@@ -1,5 +1,6 @@
 package com.github.maxopoly.zeus.rabbit;
 
+import java.util.Objects;
 import org.json.JSONObject;
 
 import com.google.common.base.Preconditions;
@@ -10,11 +11,25 @@ import com.google.common.base.Preconditions;
  */
 public abstract class RabbitMessage {
 
+	public static final String TYPE_KEY = "%%type";
+	public static final String TRANSACTION_KEY = "%%transaction_id";
+
 	private final String transactionID;
 
 	public RabbitMessage(String transactionID) {
-		Preconditions.checkNotNull(transactionID);
-		this.transactionID = transactionID;
+		this.transactionID = Objects.requireNonNull(transactionID,
+				"RabbitMessage requires a transaction id!");
+	}
+
+	/**
+	 * This is a deserialisation constructor, the counterpart to {@link #enrichJson(JSONObject)}. You should include
+	 * this type of constructor in all your packets to keep serialisation and deserialisation in one place.
+	 *
+	 * @param json The JSON object to deserialise from.
+	 */
+	public RabbitMessage(final JSONObject json) {
+		this(Objects.requireNonNull(json.getString(TRANSACTION_KEY),
+				"RabbitMessage requires a valid object to deserialise!"));
 	}
 
 	/**
@@ -25,8 +40,8 @@ public abstract class RabbitMessage {
 	 */
 	public JSONObject getJSON() {
 		JSONObject json = new JSONObject();
-		json.put("%%type", getIdentifier());
-		json.put("%%transaction_id", transactionID);
+		json.put(TYPE_KEY, getIdentifier());
+		json.put(TRANSACTION_KEY, this.transactionID);
 		enrichJson(json);
 		return json;
 	}
@@ -47,7 +62,7 @@ public abstract class RabbitMessage {
 	 * @return ID uniquely identifying this message exchange
 	 */
 	public String getTransactionID() {
-		return transactionID;
+		return this.transactionID;
 	}
 
 }

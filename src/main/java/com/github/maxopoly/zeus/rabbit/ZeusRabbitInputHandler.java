@@ -1,7 +1,5 @@
 package com.github.maxopoly.zeus.rabbit;
 
-import org.apache.logging.log4j.Logger;
-
 import com.github.maxopoly.zeus.model.TransactionIdManager;
 import com.github.maxopoly.zeus.rabbit.abstr.AbstractRabbitInputHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.apollo.NotifyPlayerSwitchShardHandler;
@@ -19,7 +17,9 @@ import com.github.maxopoly.zeus.rabbit.incoming.artemis.ReceivePlayerData;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.RequestPlayerNameHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.RequestPlayerUUIDHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.SendPlayerReply;
+import com.github.maxopoly.zeus.rabbit.incoming.artemis.SendPlayerTextComponentHandler;
 import com.github.maxopoly.zeus.rabbit.incoming.artemis.ServerWhitelistLevelChange;
+import org.apache.logging.log4j.Logger;
 
 public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 
@@ -51,6 +51,7 @@ public class ZeusRabbitInputHandler extends AbstractRabbitInputHandler {
 		registerCommand(new ServerWhitelistLevelChange());
 		registerCommand(new RequestPlayerNameHandler());
 		registerCommand(new RequestPlayerUUIDHandler());
+		registerCommand(new SendPlayerTextComponentHandler());
 		
 
 		// registerCommand(new AddBroadcastInterest());

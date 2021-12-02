@@ -54,7 +54,7 @@ public class PlayerInitTransferRequest extends InteractiveRabbitCommand<PlayerTr
 		if (targetServer == null) {
 			sendReply(sendingServer,
 					new RejectPlayerTransfer(connState.getTransactionID(), TransferRejectionReason.NO_TARGET_FOUND));
-			getLogger().error("Failed to find target server for " + connState.getLocation() + " from " + sendingServer);
+			getLogger().error("Failed to find target server for " + connState.getLocation() + " from " + sendingServer.getID());
 			return false;
 		}
 		connState.setTargetServer(targetServer);
